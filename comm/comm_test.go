@@ -281,28 +281,50 @@ func TestExtractingCreateTableInfo(t *testing.T) {
 	tests := []struct {
 		name    string
 		SQLText string
-		want    []string
+		want    []TableConstraints
 	}{
 		{
 			name: "test001",
-			SQLText: `CREATE TABLE authe (
-  id bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  scene_num varchar(64) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '编号',
-  source_channel varchar(128) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '渠道',
-  PRIMARY KEY (id)
-) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;`,
-			want: []string{"d1.t1", "d2.t2"},
+			SQLText: `CREATE TABLE t_table (
+id BIGINT ( 20 ) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+identifier VARCHAR ( 64 ) DEFAULT NULL COMMENT '用户唯一标识',
+item_code VARCHAR ( 64 ) DEFAULT NULL COMMENT '条目编码',
+switch_state INT ( 4 ) DEFAULT NULL COMMENT '开关状态',
+version_num VARCHAR ( 16 ) NOT NULL DEFAULT '0' COMMENT '版本号',
+PRIMARY KEY ( id ),
+UNIQUE KEY uk_identifer_item ( identifier, item_code ) USING BTREE,
+KEY idx_item_code ( item_code, switch_state, version_num ) USING BTREE 
+) ENGINE = INNODB DEFAULT CHARSET = utf8mb4`,
+			want: []TableConstraints{
+				{
+					Name:   "",
+					Type:   "PRIMARY KEY",
+					Column: []string{"id"},
+				},
+				{
+					Name:   "uk_identifer_item",
+					Type:   "UNIQUE",
+					Column: []string{"identifier", "item_code"},
+				},
+				{
+					Name:   "idx_item_code",
+					Type:   "INDEX",
+					Column: []string{"item_code", "switch_state", "version_num"},
+				},
+			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			o, err := ExtractingCreateTableInfo(test.SQLText)
+			o, err := ExtractingTableConstraints(test.SQLText)
 			if err != nil {
 				t.Fatalf("%v", err)
 			}
-			if !SlicesEqual(o, test.want) {
-				t.Fatalf("DML2Select('%v') failed, got:%v, want:%v", test.SQLText, o, test.want)
+			o1 := fmt.Sprintf("%v", o)
+			want1 := fmt.Sprintf("%v", test.want)
+			if o1 != want1 {
+				t.Fatalf("ExtractingTableConstraints('%v') failed, got:%v, want:%v", test.SQLText, o1, want1)
 			}
 		})
 	}

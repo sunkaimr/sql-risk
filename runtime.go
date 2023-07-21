@@ -1,4 +1,4 @@
-package risk
+package sqlrisk
 
 import (
 	"encoding/json"

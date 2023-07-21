@@ -1729,7 +1729,6 @@ func parseRuleValue(c *Policy) error {
 			return fmt.Errorf("the type of slice for rule value is not supported(%s), policy id:%s",
 				reflect.TypeOf(oValue.Index(0).Interface()).String(), c.ID)
 		}
-
 	}
 
 	// 字符串

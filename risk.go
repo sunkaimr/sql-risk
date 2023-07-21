@@ -1,4 +1,4 @@
-package risk
+package sqlrisk
 
 import (
 	"fmt"
@@ -305,9 +305,9 @@ func (c *SQLRisk) CollectAction() (policy.OperateType, policy.ActionType, policy
 	case *ast.DropIndexStmt:
 		// 删除索引：DROP INDEX IF EXISTS myindex ON mytable;
 		return policy.Operate.V.DDL, policy.Action.V.Drop, policy.KeyWord.V.DropIdx, nil
-	case *ast.DropProcedureStmt:
-		// 删除存储过程：DROP PROCEDURE IF EXISTS myprocedure;
-		return policy.Operate.V.DDL, policy.Action.V.Drop, policy.KeyWord.V.DropProcedure, nil
+	//case *ast.DropProcedureStmt:
+	//	// 删除存储过程：DROP PROCEDURE IF EXISTS myprocedure;
+	//	return policy.Operate.V.DDL, policy.Action.V.Drop, policy.KeyWord.V.DropProcedure, nil
 	case *ast.TruncateTableStmt:
 		// 截断表：TRUNCATE TABLE mytable;
 		return policy.Operate.V.DDL, policy.Action.V.Truncate, policy.KeyWord.V.TruncateTab, nil
@@ -761,7 +761,17 @@ func (c *SQLRisk) CollectPrimaryKeyExist() (bool, error) {
 	}
 
 	if !tabExist {
+		constraints, err := comm.ExtractingTableConstraints(c.SQLText)
+		if err != nil {
+			return false, fmt.Errorf("extracting table constraints failed, %s", err)
+		}
 
+		for _, c := range constraints {
+			if c.Type == "PRIMARY KEY" {
+				return true, nil
+			}
+		}
+		return false, nil
 	}
 
 	// 表存在时判断连库判断主键

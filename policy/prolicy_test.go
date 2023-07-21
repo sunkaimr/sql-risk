@@ -3,9 +3,6 @@ package policy
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/DATA-DOG/go-sqlmock"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"testing"
 )
 
@@ -59,15 +56,7 @@ func TestGenerateDefaultPolicy(t *testing.T) {
 }
 
 func TestMatchBasicPolicy(t *testing.T) {
-	dbMock, mock, _ := sqlmock.New()
-	rows := sqlmock.NewRows([]string{"VERSION()"}).AddRow("8.0.0")
-	mock.ExpectQuery("SELECT VERSION()").WillReturnRows(rows)
-	mock.ExpectBegin()
-	mock.ExpectExec("DELETE").WillReturnResult(sqlmock.NewResult(0, 0))
-	mock.ExpectExec("INSERT").WillReturnResult(sqlmock.NewResult(0, 0))
-	mock.ExpectCommit()
-	db, _ := gorm.Open(mysql.New(mysql.Config{Conn: dbMock}), &gorm.Config{})
-
+	initDB()
 	err := RefreshDefaultPolicyToDB(db)
 	if err != nil {
 		t.Fatal(err)
@@ -79,7 +68,6 @@ func TestMatchBasicPolicy(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-
 		fmt.Printf("%v\n%+v", b, policy)
 	})
 }

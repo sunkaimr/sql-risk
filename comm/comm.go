@@ -29,6 +29,12 @@ const (
 
 var LevelMap = map[Level]int{Fatal: 4, High: 3, Low: 2, Info: 1}
 
+type TableConstraints struct {
+	Name   string
+	Type   string
+	Column []string
+}
+
 // SplitStatement 将多个SQL语句进行拆分
 func SplitStatement(sqls string) []string {
 	sqlList := make([]string, 0, 1)
@@ -387,9 +393,9 @@ func ExtractingTableName(sql string, defaultDB string) ([]string, error) {
 	return RemoveDuplicatesItem(tables), nil
 }
 
-// ExtractingCreateTableInfo 从表的创建语句中提取表各列的约束信息
-func ExtractingCreateTableInfo(sql string) (map[string][]string, error) {
-	columns := make(map[string][]string, 5)
+// ExtractingTableConstraints 从表的创建语句中提取表各列的约束信息
+func ExtractingTableConstraints(sql string) ([]TableConstraints, error) {
+	constraints := make([]TableConstraints, 0, 1)
 	node, err := TiParse(sql, "", "")
 	if err != nil {
 		return nil, err
@@ -397,11 +403,38 @@ func ExtractingCreateTableInfo(sql string) (map[string][]string, error) {
 
 	switch n := node.(type) {
 	case *ast.CreateTableStmt:
-		_ = n
+		for _, constraint := range n.Constraints {
+			c := TableConstraints{}
+			switch constraint.Tp {
+			case ast.ConstraintPrimaryKey:
+				c.Type = "PRIMARY KEY"
 
+			case ast.ConstraintKey:
+				c.Type = "KEY"
+			case ast.ConstraintIndex:
+				c.Type = "INDEX"
+			case ast.ConstraintUniq:
+				c.Type = "UNIQUE"
+			case ast.ConstraintUniqKey:
+				c.Type = "UNIQUE KEY"
+			case ast.ConstraintUniqIndex:
+				c.Type = "UNIQUE INDEX"
+			case ast.ConstraintForeignKey:
+				c.Type = "FOREIGN KEY"
+			case ast.ConstraintFulltext:
+				c.Type = "FULLTEXT"
+			case ast.ConstraintCheck:
+				c.Type = "CHECK"
+			}
+			c.Name = constraint.Name
+
+			for _, key := range constraint.Keys {
+				c.Column = append(c.Column, key.Column.Name.O)
+			}
+			constraints = append(constraints, c)
+		}
 	}
-
-	return columns, nil
+	return constraints, nil
 }
 
 // ExtractingWhereColumn 从SQL中提取where后跟的条件列

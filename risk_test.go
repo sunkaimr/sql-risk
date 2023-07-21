@@ -1,4 +1,4 @@
-package risk
+package sqlrisk
 
 import (
 	"github.com/sunkaimr/sql-risk/comm"
