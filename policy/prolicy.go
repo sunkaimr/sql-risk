@@ -1662,7 +1662,7 @@ func parseRuleValue(c *Policy) error {
 	// 纯数字：		2048
 	// 布尔：  		true false
 	// 字符串：		update set
-	// 字符串切片：	[], ["OPE.INSERT.000"]
+	// 字符串切片：	["*"], ["OPE.INSERT.000"]
 	// 整型切片：	[20000,100000]
 	value := ""
 	if value1, ok := (c.Value).(*any); ok {

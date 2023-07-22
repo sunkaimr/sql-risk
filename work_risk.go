@@ -16,15 +16,13 @@ const (
 )
 
 type WorkRisk struct {
-	WorkID       string
-	SourceID     string
-	ServiceUniID string
-	Addr         string
-	Port         string
-	User         string
-	Passwd       string
-	DataBase     string
-	TableName    string
+	WorkID    string
+	Addr      string
+	Port      string
+	User      string
+	Passwd    string
+	DataBase  string
+	TableName string
 
 	SQLText string
 

@@ -1,6 +1,7 @@
 package sqlrisk
 
 import (
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/sunkaimr/sql-risk/comm"
 	"testing"
 )

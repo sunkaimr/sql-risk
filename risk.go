@@ -13,7 +13,6 @@ import (
 )
 
 type SQLRisk struct {
-	//ServiceUniID string
 	Addr     string
 	Port     string
 	User     string
@@ -158,35 +157,6 @@ func (c *SQLRisk) IdentifyPreRisk() error {
 	c.MatchAggPolicy = matchAggPolicy[0]
 	c.SetMatchPolicies(matchPolicy)
 	c.SetPreResult(matchPolicy.Level, matchPolicy.Special)
-
-	//matched := false
-	// 定制策略
-	//b, matchRules, err := MatchSpecialStrategies(env)
-	//if err != nil {
-	//	return fmt.Errorf("match specialstrategies failed, %s", err)
-	//}
-	//c.SetMatchPolicies(matchRules)
-	//if b && !matched {
-	//	c.SetPreResult(matchRules[0].Level, matchRules[0].Special)
-	//	matched = true
-	//}
-	//
-	//// 基本风险策略
-	//b, matchRules, err = MatchBasicStrategies(env)
-	//if err != nil {
-	//	return fmt.Errorf("match basicstrategies failed, %s", err)
-	//}
-	//c.SetMatchPolicies(matchRules)
-	//if b && !matched {
-	//	c.SetPreResult(matchRules[0].Level, matchRules[0].Special)
-	//	matched = true
-	//}
-	//
-	//// 默认规则
-	//if !matched {
-	//	c.SetPreResult(DefaultStrategy.Level, DefaultStrategy.Special)
-	//	c.SetMatchPolicies([]Rule{DefaultStrategy})
-	//}
 
 	return nil
 }
