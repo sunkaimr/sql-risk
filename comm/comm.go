@@ -796,11 +796,11 @@ func extractingDeleteStmtList(defaultDB string, alias map[string]string, stmt *a
 func extractingTableAlias(defaultDB string, aliasMap map[string]string, sets ...ast.ResultSetNode) {
 	//n.TableRefs.TableRefs.Left.(*ast.Join).Left
 	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).AsName
-	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).Source.(*ast.TableName).Schema
-	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).Source.(*ast.TableName).Name
+	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).Source.(*ast.Tables).Schema
+	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).Source.(*ast.Tables).Name
 
-	//n.TableRefs.TableRefs.Right.(*ast.TableSource).Source.(*ast.TableName).Schema
-	//n.TableRefs.TableRefs.Right.(*ast.TableSource).Source.(*ast.TableName).Name
+	//n.TableRefs.TableRefs.Right.(*ast.TableSource).Source.(*ast.Tables).Schema
+	//n.TableRefs.TableRefs.Right.(*ast.TableSource).Source.(*ast.Tables).Name
 	//n.TableRefs.TableRefs.Right.(*ast.TableSource).AsName
 
 	for _, set := range sets {
@@ -831,11 +831,11 @@ func extractingTableAlias(defaultDB string, aliasMap map[string]string, sets ...
 func extractingTableName(defaultDB string, sets ...ast.ResultSetNode) []string {
 	//n.TableRefs.TableRefs.Left.(*ast.Join).Left
 	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).AsName
-	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).Source.(*ast.TableName).Schema
-	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).Source.(*ast.TableName).Name
+	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).Source.(*ast.Tables).Schema
+	//n.TableRefs.TableRefs.Left.(*ast.Join).Left.(*ast.TableSource).Source.(*ast.Tables).Name
 
-	//n.TableRefs.TableRefs.Right.(*ast.TableSource).Source.(*ast.TableName).Schema
-	//n.TableRefs.TableRefs.Right.(*ast.TableSource).Source.(*ast.TableName).Name
+	//n.TableRefs.TableRefs.Right.(*ast.TableSource).Source.(*ast.Tables).Schema
+	//n.TableRefs.TableRefs.Right.(*ast.TableSource).Source.(*ast.Tables).Name
 	//n.TableRefs.TableRefs.Right.(*ast.TableSource).AsName
 	var tables []string
 	for _, set := range sets {

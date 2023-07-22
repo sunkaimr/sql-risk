@@ -62,7 +62,7 @@ func TestMatchBasicPolicy(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Run("MatchBasicPolicy", func(t *testing.T) {
+	t.Run("MatchedBasicPolicy", func(t *testing.T) {
 		env := generateDefaultBasicPolicy()
 		b, policy, err := MatchBasicPolicy(env)
 		if err != nil {

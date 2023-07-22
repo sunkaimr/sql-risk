@@ -127,12 +127,12 @@ func TestCollectAffectRows(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			test.input.RelevantTableName, err = comm.ParseRelatedTableName(test.input.SQLText, test.input.DataBase)
+			test.input.RelevantTables, err = comm.ParseRelatedTableName(test.input.SQLText, test.input.DataBase)
 			if err != nil {
 				t.Fatalf("parse related table name failed, %s", err)
 			}
 
-			test.input.TableName, err = comm.ExtractingTableName(test.input.SQLText, test.input.DataBase)
+			test.input.Tables, err = comm.ExtractingTableName(test.input.SQLText, test.input.DataBase)
 			if err != nil {
 				t.Fatalf("extracting table name failed, %s", err)
 			}

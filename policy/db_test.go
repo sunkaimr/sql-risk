@@ -86,7 +86,7 @@ func TestRefreshPolicyFromDB(t *testing.T) {
 		mock.ExpectQuery("SELECT VERSION()").WillReturnRows(rows)
 		rows1 := sqlmock.NewRows([]string{"id", "name", "enable", "type", "rule_id", "operator", "value", "level", "special", "priority"}).
 			AddRow("OPE.SELECT.001", "查询", 1, "BASIC", "KeyWord", "==", any("select"), "low", 0, 60) /*.
-		AddRow("AGG.RULEPRIORITY.001", "优先级最高的基本策略", 1, "AGG", "RulePriority", "highest", any("[\"*\"]"), "low", 1, 150)*/
+			AddRow("AGG.RULEPRIORITY.001", "优先级最高的基本策略", 1, "AGG", "RulePriority", "highest", any("[\"*\"]"), "low", 1, 150)*/
 		mock.ExpectQuery("SELECT ").WillReturnRows(rows1)
 		db, _ = gorm.Open(mysql.New(mysql.Config{Conn: dbMock}), &gorm.Config{})
 	} else {

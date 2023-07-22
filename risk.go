@@ -13,88 +13,79 @@ import (
 )
 
 type SQLRisk struct {
-	Addr     string
-	Port     string
-	User     string
-	Passwd   string
-	DataBase string
-	// SQL语句中涉及到所有库、表
-	RelevantTableName []string
-	// SQL语句中操作的（增、删、改，查）所有库、表
-	TableName []string
-	SQLText   string
-
-	RiskItems []RiskItem
-
-	MatchBasicPolicy []policy.Policy
-	MatchAggPolicy   policy.Policy
-
-	InfoPolicy  []policy.Policy
-	LowPolicy   []policy.Policy
-	HighPolicy  []policy.Policy
-	FatalPolicy []policy.Policy
-
-	PreResult  PreResult
-	PostResult PostResult
-
-	Errors []ErrorResult
+	WorkID             string          `gorm:"type:varchar(64);primary_key;column:work_id;comment:工单ID" json:"work_id"`
+	Addr               string          `gorm:"type:varchar(64);not null;column:addr;comment:数据源地址" json:"addr"`
+	Port               string          `gorm:"type:varchar(64);not null;column:port;comment:数据源端口" json:"port"`
+	User               string          `gorm:"type:varchar(64);not null;column:user;comment:用户名" json:"user"`
+	Passwd             string          `gorm:"-" json:"-"`
+	DataBase           string          `gorm:"type:varchar(1024);not null;column:data_base;comment:数据库名称" json:"database"`
+	RelevantTables     []string        `gorm:"type:json;column:relevant_tables;comment:SQL语句中涉及到所有库、表" json:"relevant_tables"`
+	Tables             []string        `gorm:"type:json;column:tables;comment:SQL语句中操作的（增、删、改，查）所有库、表" json:"tables"`
+	SQLText            string          `gorm:"type:longtext;column:sql_text;comment:SQL" json:"sql_text"`
+	ItemValues         []ItemValue     `gorm:"type:json;column:item_values;comment:风险评估项结果" json:"item_values"`
+	MatchedBasicPolicy []policy.Policy `gorm:"type:json;column:matched_basic_policy;comment:匹配到的基本策略" json:"matched_basic_policy"`
+	MatchedAggPolicy   policy.Policy   `gorm:"type:json;column:matched_agg_policy;comment:匹配到的聚合策略" json:"matched_agg_policy"`
+	InfoPolicy         []policy.Policy `gorm:"type:json;column:info_policy;comment:最终生效的info级别的策略" json:"info_policy"`
+	LowPolicy          []policy.Policy `gorm:"type:json;column:low_policy;comment:最终生效的low级别的策略" json:"low_policy"`
+	HighPolicy         []policy.Policy `gorm:"type:json;column:high_policy;comment:最终生效的high级别的策略" json:"high_policy"`
+	FatalPolicy        []policy.Policy `gorm:"type:json;column:fatal_policy;comment:最终生效的fatal级别的策略" json:"fatal_policy"`
+	PreResult          PreResult       `gorm:"type:json;column:pre_result;comment:前置风险识别结果" json:"pre_result"`
+	PostResult         PostResult      `gorm:"type:json;column:post_result;comment:后置风险识别结果" json:"post_result"`
+	Errors             []ErrorResult   `gorm:"type:json;column:errors;comment:错误信息" json:"errors"`
+	Config             *Config         `gorm:"type:json;column:config;comment:相关配置信息" json:"config"`
 }
 
 type ErrorResult struct {
-	Type  string
-	Error error
+	Type  string `json:"type"`
+	Error error  `json:"error"`
 }
 
-type RiskItem struct {
-	Name  string
-	ID    string
-	Value any
-}
-
-type Rule struct {
-	Name string
-	// 规则表达式
-	Expr string
-	// 规则优先级
-	Priority int
-	// 描述
-	Description string
-	// 风险等级
-	Level comm.Level
-	// 是否特殊审批
-	Special bool
+type ItemValue struct {
+	Name  string `json:"name"`
+	ID    string `json:"id"`
+	Value any    `json:"value"`
 }
 
 type PreResult struct {
 	// 风险等级
-	Level comm.Level
+	Level comm.Level `json:"level"`
 	// 是否需要走特殊审批
-	Special bool
+	Special bool `json:"special"`
 	// 是否跨BU
-	CrossBu bool
+	CrossBu bool `json:"cross_bu"`
 	//  是否开启跨BU审核
-	CrossBuAudit bool
+	CrossBuAudit bool `json:"cross_bu_audit"`
 }
 
 type PostResult struct {
 	// 风险等级
-	Level comm.Level
+	Level comm.Level `json:"level"`
 	// 是否支持自动执行
-	Operation int
+	Operation int `json:"operation"`
+}
+
+// RiskConfig 风险相关配置
+type RiskConfig struct {
+	// 事务的持续时间
+	TxDuration int `json:"tx_duration"`
+	// 表行数小于TabRowsThreshold（默认10w）&&表大小小于TabRSizeThreshold（默认2G）时使用DML改查询后select count(*)计算影响行数
+	// 否则使用Explain获取影响行数
+	TabRowsThreshold int `json:"tab_rows_threshold"`
+	TabSizeThreshold int `json:"tab_size_threshold"`
 }
 
 func (c *SQLRisk) IdentifyPreRisk() error {
 	var err error
 
-	if len(c.RelevantTableName) == 0 {
-		c.RelevantTableName, err = comm.ParseRelatedTableName(c.SQLText, c.DataBase)
+	if len(c.RelevantTables) == 0 {
+		c.RelevantTables, err = comm.ParseRelatedTableName(c.SQLText, c.DataBase)
 		if err != nil {
 			return fmt.Errorf("parse related table name failed, %s", err)
 		}
 	}
 
-	if len(c.TableName) == 0 {
-		c.TableName, err = comm.ExtractingTableName(c.SQLText, c.DataBase)
+	if len(c.Tables) == 0 {
+		c.Tables, err = comm.ExtractingTableName(c.SQLText, c.DataBase)
 		if err != nil {
 			return fmt.Errorf("extracting table name failed, %s", err)
 		}
@@ -106,7 +97,7 @@ func (c *SQLRisk) IdentifyPreRisk() error {
 	}
 
 	env := make(map[string]any, 5)
-	for _, v := range c.RiskItems {
+	for _, v := range c.ItemValues {
 		switch v.Value.(type) {
 		case policy.OperateType, policy.ActionType, policy.KeyWordType:
 			env[v.ID] = fmt.Sprintf("%v", v.Value)
@@ -153,8 +144,8 @@ func (c *SQLRisk) IdentifyPreRisk() error {
 			matchPolicy = matchBasicPolicy[len(matchBasicPolicy)-1]
 		}
 	}
-	c.MatchBasicPolicy = matchBasicPolicy
-	c.MatchAggPolicy = matchAggPolicy[0]
+	c.MatchedBasicPolicy = matchBasicPolicy
+	c.MatchedAggPolicy = matchAggPolicy[0]
 	c.SetMatchPolicies(matchPolicy)
 	c.SetPreResult(matchPolicy.Level, matchPolicy.Special)
 
@@ -465,7 +456,7 @@ func (c *SQLRisk) CollectAffectRows() (int, error) {
 	defer conn.Close()
 
 	var affectRows int64
-	if tabRows <= 100000 && tabSize < 2048 {
+	if tabRows <= c.Config.RiskConfig.TabRowsThreshold && tabSize < c.Config.RiskConfig.TabSizeThreshold {
 		// 查询语句的影响行数
 		affectRows, err = conn.AffectRows(selectSQL)
 		if err != nil {
@@ -489,7 +480,7 @@ func (c *SQLRisk) CollectAffectRows() (int, error) {
 
 // CollectTableExist 判断表是否存在
 func (c *SQLRisk) CollectTableExist() (bool, error) {
-	for _, t := range c.TableName {
+	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
 			continue
@@ -522,7 +513,7 @@ func (c *SQLRisk) CollectTableExist() (bool, error) {
 func (c *SQLRisk) CollectTableSize() (int, error) {
 	maxSize := 0
 
-	for _, t := range c.TableName {
+	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
 			continue
@@ -555,7 +546,7 @@ func (c *SQLRisk) CollectTableSize() (int, error) {
 func (c *SQLRisk) CollectTableRows() (int, error) {
 	maxRows := 0
 
-	for _, t := range c.TableName {
+	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
 			continue
@@ -586,14 +577,14 @@ func (c *SQLRisk) CollectTableRows() (int, error) {
 
 // CollectFreeDisk 剩余磁盘空间
 func (c *SQLRisk) CollectFreeDisk() (int, error) {
-	disk, err := NewClient(ThanosURL).DiskFree(c.Addr, time.Now())
+	disk, err := NewClient(c.Config.Runtime.Url).DiskFree(c.Addr, time.Now())
 	if err == nil {
 		return int(disk), nil
 	}
 
 	if strings.Contains(err.Error(), NoDataPointError.Error()) {
 		// 找不到数据，向前提5min再试一次
-		disk, err = NewClient(ThanosURL).DiskFree(c.Addr, time.Now().Add(-5*time.Minute))
+		disk, err = NewClient(c.Config.Runtime.Url).DiskFree(c.Addr, time.Now().Add(-5*time.Minute))
 		if err != nil {
 			return 0, err
 		}
@@ -637,14 +628,14 @@ func (c *SQLRisk) CollectDiskSufficient() (bool, error) {
 
 // CollectCpuUsage CPU使用率
 func (c *SQLRisk) CollectCpuUsage() (int, error) {
-	cpu, err := NewClient(ThanosURL).CpuUsage(c.Addr, time.Now())
+	cpu, err := NewClient(c.Config.Runtime.Url).CpuUsage(c.Addr, time.Now())
 	if err == nil {
 		return int(cpu), nil
 	}
 
 	if strings.Contains(err.Error(), NoDataPointError.Error()) {
 		// 找不到数据，向前提5min再试一次
-		cpu, err = NewClient(ThanosURL).CpuUsage(c.Addr, time.Now().Add(time.Minute*-5))
+		cpu, err = NewClient(c.Config.Runtime.Url).CpuUsage(c.Addr, time.Now().Add(time.Minute*-5))
 		if err != nil {
 			return 0, err
 		}
@@ -689,9 +680,8 @@ func (c *SQLRisk) CollectTranRelated() (bool, error) {
 			continue
 		}
 
-		// TODO 时间需要可配
 		// 判断事务运行的时间
-		if time.Now().Sub(start) < time.Second*10 {
+		if time.Now().Sub(start) < time.Second*time.Duration(c.Config.RiskConfig.TxDuration) {
 			continue
 		}
 
@@ -745,7 +735,7 @@ func (c *SQLRisk) CollectPrimaryKeyExist() (bool, error) {
 	}
 
 	// 表存在时判断连库判断主键
-	for _, t := range c.TableName {
+	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
 			continue
@@ -781,7 +771,7 @@ func (c *SQLRisk) CollectPrimaryKeyExist() (bool, error) {
 
 // CollectForeignKeyExist 是否存在外键
 func (c *SQLRisk) CollectForeignKeyExist() (bool, error) {
-	for _, t := range c.TableName {
+	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
 			continue
@@ -816,7 +806,7 @@ func (c *SQLRisk) CollectForeignKeyExist() (bool, error) {
 
 // CollectTriggerExist 是否存在触发器
 func (c *SQLRisk) CollectTriggerExist() (bool, error) {
-	for _, t := range c.TableName {
+	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
 			continue
@@ -868,7 +858,7 @@ func (c *SQLRisk) CollectIndexExistInWhere() (bool, error) {
 		return false, fmt.Errorf("extracting where column failed, %s", err)
 	}
 
-	for _, t := range c.TableName {
+	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
 			continue
@@ -910,7 +900,7 @@ func (c *SQLRisk) CollectIndexExistInWhere() (bool, error) {
 
 // GetItemValue 根据风险ID获取对应的结果
 func (c *SQLRisk) GetItemValue(id string) any {
-	for _, item := range c.RiskItems {
+	for _, item := range c.ItemValues {
 		if item.ID == id {
 			return item.Value
 		}
@@ -920,13 +910,13 @@ func (c *SQLRisk) GetItemValue(id string) any {
 
 // SetItemValue 设置风险结果，如果存在就更新不存在添加
 func (c *SQLRisk) SetItemValue(name, id string, v any) {
-	for _, item := range c.RiskItems {
+	for _, item := range c.ItemValues {
 		if item.ID == id {
 			item.Value = v
 			return
 		}
 	}
-	c.RiskItems = append(c.RiskItems, RiskItem{Name: name, ID: id, Value: v})
+	c.ItemValues = append(c.ItemValues, ItemValue{Name: name, ID: id, Value: v})
 }
 
 // SetItemError 记录错误信息

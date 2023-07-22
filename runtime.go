@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	ThanosURL = "http://thanos-realtime.cowelltech.com/"
+	ThanosURL = "http://thanos-realtime.xxx.com/"
 	// CPU 5min内的使用率
 	cpuUsagePromQL = "avg_over_time(qce_cdb_cpuuserate_max{vip='%s'}[5m])"
 

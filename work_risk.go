@@ -16,22 +16,52 @@ const (
 )
 
 type WorkRisk struct {
-	WorkID    string
-	Addr      string
-	Port      string
-	User      string
-	Passwd    string
-	DataBase  string
-	TableName string
+	WorkID     string        `gorm:"type:varchar(64);primary_key;column:work_id;comment:工单ID" json:"work_id"`
+	Addr       string        `gorm:"type:varchar(64);not null;column:addr;comment:数据源地址" json:"addr"`
+	Port       string        `gorm:"type:varchar(64);not null;column:port;comment:数据源端口" json:"port"`
+	User       string        `gorm:"type:varchar(64);not null;column:user;comment:用户名" json:"user"`
+	Passwd     string        `gorm:"-" json:"-"`
+	DataBase   string        `gorm:"type:varchar(1024);not null;column:data_base;comment:数据库名称" json:"database"`
+	TableName  string        `gorm:"type:varchar(1024);column:addr;comment:表名" json:"table_name"`
+	SQLText    string        `gorm:"type:longtext;column:sql_text;comment:SQL" json:"sql_text"`
+	SQLRisks   []SQLRisk     `gorm:"-;comment:各个SQL风险" json:"sql_risks"`
+	PreResult  PreResult     `gorm:"type:json;column:pre_result;comment:前置风险识别结果" json:"pre_result"`
+	PostResult PostResult    `gorm:"type:json;column:post_result;comment:后置风险识别结果" json:"post_result"`
+	Errors     []ErrorResult `gorm:"type:json;column:errors;comment:错误信息" json:"errors"`
+	Config     *Config       `gorm:"type:json;column:config;comment:相关配置信息" json:"config"`
+}
 
-	SQLText string
+type Config struct {
+	Runtime    Client
+	RiskConfig RiskConfig
+}
 
-	SQLRisks []SQLRisk
+func NewWorkRisk(workID, addr, port, user, passwd, database, table, sql string, config *Config) *WorkRisk {
+	if config == nil {
+		config = newDefaultConfig()
+	}
+	return &WorkRisk{
+		WorkID:    workID,
+		Addr:      addr,
+		Port:      port,
+		User:      user,
+		Passwd:    passwd,
+		DataBase:  database,
+		TableName: table,
+		SQLText:   sql,
+		Config:    config,
+	}
+}
 
-	PreResult  PreResult
-	PostResult PostResult
-
-	Errors []ErrorResult
+func newDefaultConfig() *Config {
+	return &Config{
+		Runtime: Client{Url: string([]byte{104, 116, 116, 112, 58, 47, 47, 116, 104, 97, 110, 111, 115, 45, 114, 101, 97, 108, 116, 105, 109, 101, 46, 99, 111, 119, 101, 108, 108, 116, 101, 99, 104, 46, 99, 111, 109})},
+		RiskConfig: RiskConfig{
+			TxDuration:       10,
+			TabRowsThreshold: 100000,
+			TabSizeThreshold: 2048,
+		},
+	}
 }
 
 // IdentifyWorkRiskPreRisk 对工单进行前置风险识别
@@ -97,7 +127,7 @@ func (c *WorkRisk) SplitStatement() error {
 	sqlList := comm.SplitStatement(c.SQLText)
 	for i, sql := range sqlList {
 		sqlRisk := SQLRisk{
-			//ServiceUniID: c.ServiceUniID,
+			WorkID:   c.WorkID,
 			Addr:     c.Addr,
 			Port:     c.Port,
 			User:     c.User,
@@ -105,14 +135,15 @@ func (c *WorkRisk) SplitStatement() error {
 			DataBase: c.DataBase,
 			SQLText:  sql,
 			Errors:   nil,
+			Config:   c.Config,
 		}
 
-		sqlRisk.RelevantTableName, err = comm.ParseRelatedTableName(sql, c.DataBase)
+		sqlRisk.RelevantTables, err = comm.ParseRelatedTableName(sql, c.DataBase)
 		if err != nil {
 			return fmt.Errorf("parse related table name failed, sql index(%d), %s", i, err)
 		}
 
-		sqlRisk.TableName, err = comm.ExtractingTableName(sql, c.DataBase)
+		sqlRisk.Tables, err = comm.ExtractingTableName(sql, c.DataBase)
 		if err != nil {
 			return fmt.Errorf("extracting table name failed,  sql index(%d), %s", i, err)
 		}
@@ -128,7 +159,7 @@ func (c *WorkRisk) ExceedingPermissions() error {
 	for _, sqlRisk := range c.SQLRisks {
 		var database []string
 
-		for _, tabName := range sqlRisk.RelevantTableName {
+		for _, tabName := range sqlRisk.RelevantTables {
 			d, _ := comm.SplitDataBaseAndTable(tabName)
 			database = append(database, d)
 		}
