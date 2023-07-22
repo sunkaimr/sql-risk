@@ -17,13 +17,13 @@ var keyWordTypeMeta []KeyWordTypeMeta
 var ruleMeta []RuleMeta
 var policyMeta []Policy
 
-const matchBasicPolicies = "matchBasicPolicies"
+const matchedBasicPolicies = "matchedBasicPolicies"
 
 func init() {
-	operateTypeMeta = generateOperateTypeMeta()
-	actionTypeMeta = generateActionTypeMeta()
-	keyWordTypeMeta = generateKeyWordTypeMeta()
-	ruleMeta = generateRuleMeta()
+	operateTypeMeta = GenerateOperateTypeMeta()
+	actionTypeMeta = GenerateActionTypeMeta()
+	keyWordTypeMeta = GenerateKeyWordTypeMeta()
+	ruleMeta = GenerateRuleMeta()
 }
 
 func GetOperateTypeMeta() []OperateTypeMeta {
@@ -46,7 +46,7 @@ func GetPolicy() []Policy {
 	return policyMeta
 }
 
-func generateOperateTypeMeta() []OperateTypeMeta {
+func GenerateOperateTypeMeta() []OperateTypeMeta {
 	pValue := reflect.ValueOf(Operate.V)
 	pType := pValue.Type()
 	mates := make([]OperateTypeMeta, 0, pValue.NumField())
@@ -63,7 +63,7 @@ func generateOperateTypeMeta() []OperateTypeMeta {
 	return mates
 }
 
-func generateActionTypeMeta() []ActionTypeMeta {
+func GenerateActionTypeMeta() []ActionTypeMeta {
 	pValue := reflect.ValueOf(Action.V)
 	pType := pValue.Type()
 	mates := make([]ActionTypeMeta, 0, pValue.NumField())
@@ -81,7 +81,7 @@ func generateActionTypeMeta() []ActionTypeMeta {
 	return mates
 }
 
-func generateKeyWordTypeMeta() []KeyWordTypeMeta {
+func GenerateKeyWordTypeMeta() []KeyWordTypeMeta {
 	pValue := reflect.ValueOf(KeyWord.V)
 	pType := pValue.Type()
 	mates := make([]KeyWordTypeMeta, 0, pValue.NumField())
@@ -99,7 +99,7 @@ func generateKeyWordTypeMeta() []KeyWordTypeMeta {
 	return mates
 }
 
-func generateRuleMeta() []RuleMeta {
+func GenerateRuleMeta() []RuleMeta {
 	rules := []RuleMeta{
 		// Operate	BASIC	OperateType	!=,==
 		{
@@ -249,7 +249,7 @@ func generateRuleMeta() []RuleMeta {
 	return rules
 }
 
-func generateDefaultPolicy() []Policy {
+func GenerateDefaultPolicy() []Policy {
 	policies := []Policy{
 		// 基本策略
 		// Action
@@ -1584,7 +1584,7 @@ func MatchAggregatePolicy(basicPolicy []Policy) (bool, []Policy, error) {
 	matchPolicies := make([]Policy, 0, 1)
 
 	env := make(map[string]any, 5)
-	env[matchBasicPolicies] = fetchPolicyID(basicPolicy)
+	env[matchedBasicPolicies] = fetchPolicyID(basicPolicy)
 	env[strings.ToUpper(string(RuleOperatorALL))] = RuleMatchAll
 	env[strings.ToUpper(string(RuleOperatorANY))] = RuleMatchANY
 	env[strings.ToUpper(RulePriority.ID+string(RuleOperatorHIG))] = RulePriorityHIG
@@ -1765,14 +1765,16 @@ func GeneratePolicyExpr(polices []Policy) ([]Policy, error) {
 		switch p.Type {
 		case BasicRule:
 			expr, err = GenerateOneBasicPolicyExpr(p)
+			if err != nil {
+				return nil, fmt.Errorf("generate basic policy expr failed, policy id:%s, %s", p.ID, err)
+			}
 		case AggRule:
 			expr, err = GenerateOneAggregatePolicyExpr(p)
+			if err != nil {
+				return nil, fmt.Errorf("generate agg policy expr failed, policy id:%s, %s", p.ID, err)
+			}
 		default:
 			return nil, fmt.Errorf("unknown policy type(%s), policy id:%s", p.Type, p.ID)
-		}
-
-		if err != nil {
-			return nil, fmt.Errorf("generate policy expr failed, policy id:%s, %s", p.ID, err)
 		}
 		newPolices[i].Expr = expr
 	}
@@ -1793,16 +1795,28 @@ func GenerateOneBasicPolicyExpr(p Policy) (string, error) {
 		}
 
 	case RuleOperatorBETWEEN:
-		v, ok := p.Value.([]int)
-		if !ok {
+		var v []int
+		switch p.Value.(type) {
+		case []int:
+			v = p.Value.([]int)
+			if len(v) != 2 {
+				return "", fmt.Errorf("OperatorType:%s rule value []int lenth must be 2, but it is %d",
+					RuleOperatorBETWEEN, len(v))
+			}
+		case []any:
+			if len(p.Value.([]any)) != 2 {
+				return "", fmt.Errorf("OperatorType:%s rule value []int lenth must be 2, but it is %d",
+					RuleOperatorBETWEEN, len(p.Value.([]any)))
+			}
+			if reflect.ValueOf(p.Value.([]any)[0]).Kind() != reflect.Int {
+				return "", fmt.Errorf("OperatorType:%s only support rule value type: []int, but it is %s",
+					RuleOperatorBETWEEN, reflect.ValueOf(p.Value.([]any)[0]).String())
+			}
+			v = append(v, (p.Value.([]any)[0]).(int), (p.Value.([]any)[1]).(int))
+		default:
 			return "", fmt.Errorf("OperatorType:%s only support rule value type: []int, but it is %T",
 				RuleOperatorBETWEEN, p.Value)
 		}
-		if len(v) != 2 {
-			return "", fmt.Errorf("OperatorType:%s rule value []int lenth must be 2, but it is %d",
-				RuleOperatorBETWEEN, len(v))
-		}
-
 		expr = fmt.Sprintf("%v <= %s && %s >= %v", v[0], p.RuleID, p.RuleID, v[1])
 	default:
 		return "", fmt.Errorf("not support operator:%s on rule type:%s", p.Operator, BasicRule)
@@ -1812,13 +1826,27 @@ func GenerateOneBasicPolicyExpr(p Policy) (string, error) {
 
 // GenerateOneAggregatePolicyExpr 生成聚合的expr表达式
 func GenerateOneAggregatePolicyExpr(p Policy) (string, error) {
-	value, ok := p.Value.([]string)
-	if !ok {
-		return "", fmt.Errorf("rule value type must be []string, but it is:%T", p.Value)
-	}
+	var value []string
+	switch p.Value.(type) {
+	case []string:
+		value = p.Value.([]string)
+		if len(value) <= 0 {
+			return "", fmt.Errorf("rule value type must be []string and lenght greate 0")
+		}
+	case []any:
+		if len(p.Value.([]any)) <= 0 {
+			return "", fmt.Errorf("rule value type must be []string and lenght greate 0")
+		}
+		if reflect.ValueOf(p.Value.([]any)[0]).Kind() != reflect.String {
+			return "", fmt.Errorf("rule value type must be []string but it is:%s",
+				reflect.ValueOf(p.Value.([]any)[0]).String())
+		}
 
-	if len(value) <= 0 {
-		return "", fmt.Errorf("rule value type must be []string and lenght greate 0")
+		for _, v := range p.Value.([]any) {
+			value = append(value, v.(string))
+		}
+	default:
+		return "", fmt.Errorf("rule value type must be []string, but it is:%T", p.Value)
 	}
 
 	expr := ""
@@ -1827,7 +1855,7 @@ func GenerateOneAggregatePolicyExpr(p Policy) (string, error) {
 		switch p.Operator {
 		case RuleOperatorALL, RuleOperatorANY:
 			expr = fmt.Sprintf("%s(%s, %s)",
-				strings.ToUpper(string(p.Operator)), matchBasicPolicies, comm.Slice2String(value))
+				strings.ToUpper(string(p.Operator)), matchedBasicPolicies, comm.Slice2String(value))
 		default:
 			return "", fmt.Errorf("not support operator:%s on rule type:%s", p.Operator, AggRule)
 		}
@@ -1835,7 +1863,7 @@ func GenerateOneAggregatePolicyExpr(p Policy) (string, error) {
 		switch p.Operator {
 		case RuleOperatorHIG, RuleOperatorLOW:
 			expr = fmt.Sprintf("%s(%s, %s)",
-				strings.ToUpper(p.RuleID+string(p.Operator)), matchBasicPolicies, comm.Slice2String(value))
+				strings.ToUpper(p.RuleID+string(p.Operator)), matchedBasicPolicies, comm.Slice2String(value))
 		default:
 			return "", fmt.Errorf("not support operator:%s on rule type:%s", p.Operator, AggRule)
 		}

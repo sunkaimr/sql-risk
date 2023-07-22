@@ -10,6 +10,7 @@ require (
 	github.com/pingcap/tidb/parser v0.0.0-20220923141543-ecd67531f172
 	github.com/tidwall/gjson v1.14.4
 	github.com/xuri/excelize/v2 v2.7.1
+	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.2
 	vitess.io/vitess v0.0.0-20200325000816-eda961851d63
@@ -61,7 +62,6 @@ require (
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	go.uber.org/goleak v1.1.12 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/crypto v0.11.0 // indirect

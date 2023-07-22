@@ -11,15 +11,14 @@ import (
 )
 
 const (
-	ThanosURL = "http://thanos-realtime.xxx.com/"
 	// CPU 5min内的使用率
 	cpuUsagePromQL = "avg_over_time(qce_cdb_cpuuserate_max{vip='%s'}[5m])"
 
 	/*
-		    https://cloud.tencent.com/document/product/248/50350#.E6.8C.87.E6.A0.87.E8.AF.B4.E6.98.8E
-			qce_cdb_volumerate_max      磁盘利用率：磁盘使用空间/实例购买空间
-			qce_cdb_capacity_max        磁盘占用空间：包括 MySQL 数据目录和  binlog、relaylog、undolog、errorlog、slowlog 日志空间
-			qce_cdb_realcapacity_max    磁盘使用空间：仅包括 MySQL 数据目录，不含 binlog、relaylog、undolog、errorlog、slowlog 日志空间
+		https://cloud.tencent.com/document/product/248/50350#.E6.8C.87.E6.A0.87.E8.AF.B4.E6.98.8E
+		qce_cdb_volumerate_max      磁盘利用率：磁盘使用空间/实例购买空间
+		qce_cdb_capacity_max        磁盘占用空间：包括 MySQL 数据目录和  binlog、relaylog、undolog、errorlog、slowlog 日志空间
+		qce_cdb_realcapacity_max    磁盘使用空间：仅包括 MySQL 数据目录，不含 binlog、relaylog、undolog、errorlog、slowlog 日志空间
 	*/
 	// 磁盘的使用率
 	diskUsagePromQL = "qce_cdb_volumerate_max{vip='%s'}"
@@ -34,6 +33,7 @@ const (
 var NoDataPointError = errors.New("no data points found")
 
 type Client struct {
+	// 	http://thanos-realtime.xxx.com
 	Url string
 }
 

@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 )
@@ -215,4 +216,18 @@ func IsSubsetSlice(subSet, set []string) bool {
 	}
 
 	return true
+}
+
+func PathExist(path string) bool {
+	info, err := os.Stat(path)
+	if err == nil {
+		if info.IsDir() {
+			return true
+		}
+		return false
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return false
 }
