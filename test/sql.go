@@ -38,9 +38,7 @@ type CoreDataSource struct {
 }
 
 func newDB() (db *gorm.DB, err error) {
-	//dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", "root", "123456", "192.168.198.128", "30336", "Yearning")
-	//return gorm.Open("mysql", dsn)
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", "root", "123456", "192.168.198.128", "30336", "test")
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", "root", "123456", "192.168.198.128", "30336", "Yearning")
 	return gorm.Open(mysql.Open(dsn), &gorm.Config{})
 }
 

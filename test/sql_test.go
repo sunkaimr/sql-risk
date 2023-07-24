@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/sunkaimr/sql-risk"
 	"github.com/sunkaimr/sql-risk/comm"
 	"github.com/sunkaimr/sql-risk/policy"
 	"github.com/xuri/excelize/v2"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"regexp"
 	"strconv"
 	"strings"
@@ -21,7 +19,7 @@ var (
 )
 
 // ReadSQLFromFile 从excel读取SQL转换为工单结构
-func ReadSQLFromFile(file, sheetName string) ([]risk.WorkRisk, error) {
+func ReadSQLFromFile(file, sheetName string) ([]sqlrisk.WorkRisk, error) {
 	// 动作	来源	编号	地址	端口	库名	表名	表大小	表行数	SQL
 	Header := map[string]int{
 		"动作":  0, //"A",
@@ -47,18 +45,18 @@ func ReadSQLFromFile(file, sheetName string) ([]risk.WorkRisk, error) {
 		return nil, fmt.Errorf("get rows failed, %s", err)
 	}
 
-	workRiskMap := make(map[string][]risk.SQLRisk, 100)
+	workRiskMap := make(map[string][]sqlrisk.SQLRisk, 100)
 	for i, row := range rows {
 		if i == 0 {
 			continue
 		}
-		r := risk.SQLRisk{
-			Addr:      row[Header["地址"]],
-			Port:      row[Header["端口"]],
-			DataBase:  row[Header["库名"]],
-			TableName: []string{row[Header["表名"]]},
-			SQLText:   row[Header["SQL"]],
-			Errors:    nil,
+		r := sqlrisk.SQLRisk{
+			Addr:     row[Header["地址"]],
+			Port:     row[Header["端口"]],
+			DataBase: row[Header["库名"]],
+			Tables:   []string{row[Header["表名"]]},
+			SQLText:  row[Header["SQL"]],
+			Errors:   nil,
 		}
 
 		if r.Addr == "" || r.Port == "" || r.DataBase == "" || r.SQLText == "" {
@@ -66,13 +64,13 @@ func ReadSQLFromFile(file, sheetName string) ([]risk.WorkRisk, error) {
 		}
 
 		if _, ok := workRiskMap[row[Header["编号"]]]; !ok {
-			workRiskMap[row[Header["编号"]]] = []risk.SQLRisk{r}
+			workRiskMap[row[Header["编号"]]] = []sqlrisk.SQLRisk{r}
 		} else {
 			workRiskMap[row[Header["编号"]]] = append(workRiskMap[row[Header["编号"]]], r)
 		}
 	}
 
-	wkSQL := make([]risk.WorkRisk, 0, len(workRiskMap))
+	wkSQL := make([]sqlrisk.WorkRisk, 0, len(workRiskMap))
 	for k, risks := range workRiskMap {
 		addr, port, db, sqlText := "", "", "", ""
 		for _, r := range risks {
@@ -87,7 +85,7 @@ func ReadSQLFromFile(file, sheetName string) ([]risk.WorkRisk, error) {
 			}
 		}
 
-		wk := risk.WorkRisk{
+		wk := sqlrisk.WorkRisk{
 			WorkID:   k,
 			Addr:     addr,
 			Port:     port,
@@ -120,7 +118,7 @@ func TestIdentifySQLFinger(t *testing.T) {
 		"SQL": 9, //  "J",
 	}
 
-	fileName, sheet1, sheet2 := "sql_finger.xlsx", "sql", "finger"
+	fileName, sheet1, sheet2 := "D:/User/sunkai/Desktop/sql-test/sql-test-0724.xlsx", "筛选", "结果"
 	f, err := excelize.OpenFile(fileName)
 	if err != nil {
 		t.Fatalf("open file %s failed, %s", actionFileName, err)
@@ -160,7 +158,8 @@ func TestIdentifySQLFinger(t *testing.T) {
 		}
 
 		sqlFinger := comm.Finger(sql)
-		c := &risk.SQLRisk{SQLText: sql}
+		//c := &sqlrisk.SQLRisk{SQLText: sql}
+		c := sqlrisk.NewSqlRisk("", "", "", "", "", "", sql, nil)
 		ope, act, keyword, err := c.CollectAction()
 		if err != nil {
 			fmt.Printf("collect action failed, %s\n", err)
@@ -194,7 +193,7 @@ func TestIdentifySQLFinger(t *testing.T) {
 		}
 
 		sqlFinger := comm.Finger(sql)
-		c := &risk.SQLRisk{SQLText: sql}
+		c := sqlrisk.NewSqlRisk("", "", "", "", "", "", sql, nil)
 		ope, act, keyword, err := c.CollectAction()
 		if err != nil {
 			fmt.Printf("collect action failed, %s\n", err)
@@ -273,7 +272,7 @@ type DmlSQL struct {
 }
 
 func QuerySQL() ([]DmlSQL, error) {
-	conn, err := risk.NewConnector(risk.NewDSN("192.168.198.128", "3306", "root", "123456", "yearning"))
+	conn, err := sqlrisk.NewConnector(sqlrisk.NewDSN("192.168.198.128", "3306", "root", "123456", "yearning"))
 	if err != nil {
 		return nil, fmt.Errorf("new mysql connect failed, %s", err)
 	}
@@ -339,9 +338,17 @@ func TestRunSQLRisk(t *testing.T) {
 	//	"错误":              20, //  "U",
 	//	"详情":              21, //  "V",
 	//}
+	store := policy.GetStore(policy.FileStoreType, ".policy.yaml")
+	err := store.Init()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = store.PolicyWriter(policy.GenerateDefaultPolicy())
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	//fileName, sheet1, sheet2 := "/home/sauser/sunkai/sql_finger-0713-result.xlsx", "筛选", "结果"
-	fileName, sheet1, sheet2 := "SQL风险识别结果对比0717.xlsx", "筛选", "结果"
+	fileName, sheet1, sheet2 := "D:/User/sunkai/Desktop/sql-test/sql-test-0724.xlsx", "筛选", "结果"
 
 	f, err := excelize.OpenFile(fileName)
 	if err != nil {
@@ -408,17 +415,10 @@ func TestRunSQLRisk(t *testing.T) {
 			fmt.Printf("GetDBAddrByDBName err: %s\n", err)
 			continue
 		}
-		r := risk.SQLRisk{
-			Addr:     addr,
-			Port:     port,
-			User:     user,
-			Passwd:   passwd,
-			DataBase: database,
-			SQLText:  sql,
-		}
+		r := sqlrisk.NewSqlRisk("", addr, port, user, passwd, database, sql, nil)
 		err = r.IdentifyPreRisk()
 		if err != nil {
-			r.SetItemError(risk.IdentifyRisk, err)
+			r.SetItemError(sqlrisk.IdentifyRisk, err)
 			_ = f.SetCellValue(sheet2, "U"+strconv.Itoa(rowNum), r.Errors)
 			b, _ := json.MarshalIndent(r, "", " ")
 			_ = f.SetCellValue(sheet2, "V"+strconv.Itoa(rowNum), string(b))
@@ -449,8 +449,16 @@ func TestRunSQLRisk(t *testing.T) {
 		_ = f.SetCellValue(sheet2, "S"+strconv.Itoa(rowNum), r.GetItemValue(policy.TriggerExist.ID))
 		_ = f.SetCellValue(sheet2, "T"+strconv.Itoa(rowNum), r.GetItemValue(policy.IndexExistInWhere.ID))
 		_ = f.SetCellValue(sheet2, "U"+strconv.Itoa(rowNum), r.Errors)
-		b, _ := json.MarshalIndent(r, "", " ")
-		_ = f.SetCellValue(sheet2, "V"+strconv.Itoa(rowNum), string(b))
+		buf := bytes.NewBuffer([]byte{})
+		encoder := json.NewEncoder(buf)
+		encoder.SetEscapeHTML(false)
+		encoder.SetIndent("", "  ")
+		err = encoder.Encode(r)
+		if err != nil {
+			panic(err)
+		}
+		s := buf.String()
+		_ = f.SetCellValue(sheet2, "V"+strconv.Itoa(rowNum), s)
 	}
 
 	style, _ := f.NewStyle(&excelize.Style{
@@ -478,27 +486,23 @@ func TestRunSQLRisk(t *testing.T) {
 }
 
 func TestRunOneSQLRisk(t *testing.T) {
-	dbMock, mock, _ := sqlmock.New()
-	rows := sqlmock.NewRows([]string{"VERSION()"}).AddRow("8.0.0")
-	mock.ExpectQuery("SELECT VERSION()").WillReturnRows(rows)
-	mock.ExpectBegin()
-	mock.ExpectExec("DELETE").WillReturnResult(sqlmock.NewResult(0, 0))
-	mock.ExpectExec("INSERT").WillReturnResult(sqlmock.NewResult(0, 0))
-	mock.ExpectCommit()
-	db, _ := gorm.Open(mysql.New(mysql.Config{Conn: dbMock}), &gorm.Config{})
-
-	err := policy.RefreshDefaultPolicyToDB(db)
+	store := policy.GetStore(policy.FileStoreType, ".policy.yaml")
+	err := store.Init()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = store.PolicyWriter(policy.GenerateDefaultPolicy())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	addr := "192.168.1.2"
+	addr := "10.2.16.83"
 	port := "3306"
-	database := "test"
-	sql := "CREATE TABLE auth;"
+	database := "cowell_dgms_0"
+	sql := `delete from bundling_task_store_detail;`
 
-	user := "root"
-	passwd := "123456"
+	user := "yearning_dml"
+	passwd := "yearning_dml"
 
 	//dbname := `test1`
 	//sql := "CREATE TABLE auth;"
@@ -507,14 +511,7 @@ func TestRunOneSQLRisk(t *testing.T) {
 	//	t.Fatalf("GetDBAddrByDBName err: %s", err)
 	//}
 
-	r := risk.SQLRisk{
-		Addr:     addr,
-		Port:     port,
-		User:     user,
-		Passwd:   passwd,
-		DataBase: database,
-		SQLText:  sql,
-	}
+	r := sqlrisk.NewSqlRisk("", addr, port, user, passwd, database, sql, nil)
 	err = r.IdentifyPreRisk()
 	if err != nil {
 		t.Fatalf("IdentifyPreRisk err: %s", err)

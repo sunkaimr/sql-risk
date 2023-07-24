@@ -59,7 +59,7 @@ func TestPolicyReadFromMysql(t *testing.T) {
 		}
 	}
 
-	store := MysqlStorage{DB: db}
+	store := GetStore(MysqlStoreType, db)
 
 	err := store.Init()
 	if err != nil {
@@ -93,7 +93,7 @@ func TestPolicyWriterToMysql(t *testing.T) {
 		}
 	}
 
-	store := MysqlStorage{DB: db}
+	store := GetStore(MysqlStoreType, db)
 
 	err := store.Init()
 	if err != nil {
@@ -106,9 +106,8 @@ func TestPolicyWriterToMysql(t *testing.T) {
 }
 
 func TestPolicyReadFromFile(t *testing.T) {
-	//file := filepath.Join(os.TempDir(), "policy.yaml")
-	file := filepath.Join(os.TempDir(), ".policy.yaml")
-	store := FileStorage{FilePath: file}
+	file := filepath.Join(".policy.yaml")
+	store := GetStore(FileStoreType, file)
 	defer func() {
 		os.Remove(file)
 	}()
@@ -132,8 +131,8 @@ func TestPolicyReadFromFile(t *testing.T) {
 }
 
 func TestPolicyWriterToFile(t *testing.T) {
-	file := filepath.Join(os.TempDir(), "policy.yaml")
-	store := FileStorage{FilePath: file}
+	file := filepath.Join(os.TempDir(), ".policy.yaml")
+	store := GetStore(FileStoreType, file)
 	defer func() {
 		os.Remove(file)
 	}()

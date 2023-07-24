@@ -254,7 +254,7 @@ func GenerateDefaultPolicy() []Policy {
 		// 基本策略
 		// Action
 		{
-			ID:          "OPE.UNKNOWN.000",
+			PolicyID:    "OPE.UNKNOWN.000",
 			Name:        "未知的动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -268,7 +268,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.SELECT.000",
+			PolicyID:    "OPE.SELECT.000",
 			Name:        "SELECT动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -282,7 +282,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DROP.000",
+			PolicyID:    "OPE.DROP.000",
 			Name:        "DROP动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -296,7 +296,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.TRUNCATE.000",
+			PolicyID:    "OPE.TRUNCATE.000",
 			Name:        "TRUNCATE动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -310,7 +310,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.000",
+			PolicyID:    "OPE.CREATE.000",
 			Name:        "CREATE动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -324,7 +324,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.000",
+			PolicyID:    "OPE.ALTER.000",
 			Name:        "ALTER动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -338,7 +338,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.INSERT.000",
+			PolicyID:    "OPE.INSERT.000",
 			Name:        "INSERT动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -352,7 +352,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.REPLACE.000",
+			PolicyID:    "OPE.REPLACE.000",
 			Name:        "REPLACE动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -366,7 +366,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DELETE.000",
+			PolicyID:    "OPE.DELETE.000",
 			Name:        "DELETE动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -380,7 +380,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.UPDATE.000",
+			PolicyID:    "OPE.UPDATE.000",
 			Name:        "UPDATE动作类型",
 			Enable:      true,
 			Type:        BasicRule,
@@ -395,7 +395,7 @@ func GenerateDefaultPolicy() []Policy {
 		},
 		// KeyWord
 		{
-			ID:          "OPE.UNKNOWN.001",
+			PolicyID:    "OPE.UNKNOWN.001",
 			Name:        "未知的关键字",
 			Enable:      true,
 			Type:        BasicRule,
@@ -409,7 +409,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.SELECT.001",
+			PolicyID:    "OPE.SELECT.001",
 			Name:        "查询",
 			Enable:      true,
 			Type:        BasicRule,
@@ -423,7 +423,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DROP.001",
+			PolicyID:    "OPE.DROP.001",
 			Name:        "删除表",
 			Enable:      true,
 			Type:        BasicRule,
@@ -437,7 +437,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DROP.002",
+			PolicyID:    "OPE.DROP.002",
 			Name:        "删除数据库",
 			Enable:      true,
 			Type:        BasicRule,
@@ -451,7 +451,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DROP.003",
+			PolicyID:    "OPE.DROP.003",
 			Name:        "删除索引",
 			Enable:      true,
 			Type:        BasicRule,
@@ -465,7 +465,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DROP.004",
+			PolicyID:    "OPE.DROP.004",
 			Name:        "删除存储过程",
 			Enable:      true,
 			Type:        BasicRule,
@@ -479,7 +479,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DROP.005",
+			PolicyID:    "OPE.DROP.005",
 			Name:        "删除函数",
 			Enable:      true,
 			Type:        BasicRule,
@@ -493,7 +493,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DROP.006",
+			PolicyID:    "OPE.DROP.006",
 			Name:        "删除视图",
 			Enable:      true,
 			Type:        BasicRule,
@@ -507,7 +507,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DROP.007",
+			PolicyID:    "OPE.DROP.007",
 			Name:        "删除触发器",
 			Enable:      true,
 			Type:        BasicRule,
@@ -521,7 +521,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.TRUNCATE.001",
+			PolicyID:    "OPE.TRUNCATE.001",
 			Name:        "截断表",
 			Enable:      true,
 			Type:        BasicRule,
@@ -535,7 +535,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.001",
+			PolicyID:    "OPE.CREATE.001",
 			Name:        "创建表",
 			Enable:      true,
 			Type:        BasicRule,
@@ -549,7 +549,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.002",
+			PolicyID:    "OPE.CREATE.002",
 			Name:        "复制表",
 			Enable:      true,
 			Type:        BasicRule,
@@ -563,7 +563,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.003",
+			PolicyID:    "OPE.CREATE.003",
 			Name:        "创建临时表",
 			Enable:      true,
 			Type:        BasicRule,
@@ -577,7 +577,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.004",
+			PolicyID:    "OPE.CREATE.004",
 			Name:        "创建索引",
 			Enable:      true,
 			Type:        BasicRule,
@@ -591,7 +591,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.005",
+			PolicyID:    "OPE.CREATE.005",
 			Name:        "创建唯一索引",
 			Enable:      true,
 			Type:        BasicRule,
@@ -605,7 +605,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.006",
+			PolicyID:    "OPE.CREATE.006",
 			Name:        "创建存储过程",
 			Enable:      true,
 			Type:        BasicRule,
@@ -619,7 +619,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.007",
+			PolicyID:    "OPE.CREATE.007",
 			Name:        "创建函数",
 			Enable:      true,
 			Type:        BasicRule,
@@ -633,7 +633,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.008",
+			PolicyID:    "OPE.CREATE.008",
 			Name:        "创建视图",
 			Enable:      true,
 			Type:        BasicRule,
@@ -647,7 +647,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.CREATE.009",
+			PolicyID:    "OPE.CREATE.009",
 			Name:        "创建触发器",
 			Enable:      true,
 			Type:        BasicRule,
@@ -661,7 +661,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.001",
+			PolicyID:    "OPE.ALTER.001",
 			Name:        "alter操作",
 			Enable:      true,
 			Type:        BasicRule,
@@ -675,7 +675,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.002",
+			PolicyID:    "OPE.ALTER.002",
 			Name:        "添加列",
 			Enable:      true,
 			Type:        BasicRule,
@@ -689,7 +689,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.003",
+			PolicyID:    "OPE.ALTER.003",
 			Name:        "删除列",
 			Enable:      true,
 			Type:        BasicRule,
@@ -703,7 +703,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.004",
+			PolicyID:    "OPE.ALTER.004",
 			Name:        "更新列",
 			Enable:      true,
 			Type:        BasicRule,
@@ -717,7 +717,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.005",
+			PolicyID:    "OPE.ALTER.005",
 			Name:        "列重命名",
 			Enable:      true,
 			Type:        BasicRule,
@@ -731,7 +731,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.006",
+			PolicyID:    "OPE.ALTER.006",
 			Name:        "修改列",
 			Enable:      true,
 			Type:        BasicRule,
@@ -745,7 +745,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.007",
+			PolicyID:    "OPE.ALTER.007",
 			Name:        "添加主键",
 			Enable:      true,
 			Type:        BasicRule,
@@ -759,7 +759,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.008",
+			PolicyID:    "OPE.ALTER.008",
 			Name:        "删除主键",
 			Enable:      true,
 			Type:        BasicRule,
@@ -773,7 +773,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.009",
+			PolicyID:    "OPE.ALTER.009",
 			Name:        "添加索引",
 			Enable:      true,
 			Type:        BasicRule,
@@ -787,7 +787,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.010",
+			PolicyID:    "OPE.ALTER.010",
 			Name:        "添加唯一约束",
 			Enable:      true,
 			Type:        BasicRule,
@@ -801,7 +801,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.011",
+			PolicyID:    "OPE.ALTER.011",
 			Name:        "添加唯一索引",
 			Enable:      true,
 			Type:        BasicRule,
@@ -815,7 +815,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.ALTER.012",
+			PolicyID:    "OPE.ALTER.012",
 			Name:        "删除索引",
 			Enable:      true,
 			Type:        BasicRule,
@@ -829,7 +829,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.INSERT.001",
+			PolicyID:    "OPE.INSERT.001",
 			Name:        "插入数据",
 			Enable:      true,
 			Type:        BasicRule,
@@ -843,7 +843,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.INSERT.002",
+			PolicyID:    "OPE.INSERT.002",
 			Name:        "插入查询数据",
 			Enable:      true,
 			Type:        BasicRule,
@@ -857,7 +857,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.REPLACE.003",
+			PolicyID:    "OPE.REPLACE.003",
 			Name:        "替换数据",
 			Enable:      true,
 			Type:        BasicRule,
@@ -871,8 +871,8 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DELETE.001",
-			Name:        "删除全表数据",
+			PolicyID:    "OPE.DELETE.001",
+			Name:        "删除部分数据",
 			Enable:      true,
 			Type:        BasicRule,
 			RuleID:      KeyWord.ID,
@@ -885,8 +885,8 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.DELETE.002",
-			Name:        "删除部分数据",
+			PolicyID:    "OPE.DELETE.002",
+			Name:        "删除全表数据",
 			Enable:      true,
 			Type:        BasicRule,
 			RuleID:      KeyWord.ID,
@@ -899,7 +899,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.UPDATE.001",
+			PolicyID:    "OPE.UPDATE.001",
 			Name:        "更新部分数据",
 			Enable:      true,
 			Type:        BasicRule,
@@ -913,7 +913,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.UPDATE.002",
+			PolicyID:    "OPE.UPDATE.002",
 			Name:        "更新全表数据",
 			Enable:      true,
 			Type:        BasicRule,
@@ -927,7 +927,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.AFFECTROWS.001",
+			PolicyID:    "OPE.AFFECTROWS.001",
 			Name:        "影响行数大于等于10w",
 			Enable:      true,
 			Type:        BasicRule,
@@ -941,7 +941,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.AFFECTROWS.002",
+			PolicyID:    "OPE.AFFECTROWS.002",
 			Name:        "影响行数在2w和10w之间",
 			Enable:      true,
 			Type:        BasicRule,
@@ -955,7 +955,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "OPE.AFFECTROWS.003",
+			PolicyID:    "OPE.AFFECTROWS.003",
 			Name:        "影响行数小于等于2w",
 			Enable:      true,
 			Type:        BasicRule,
@@ -964,12 +964,26 @@ func GenerateDefaultPolicy() []Policy {
 			Value:       20000,
 			Level:       comm.Low,
 			Special:     false,
+			Priority:    50,
+			Description: "",
+			Suggestion:  "",
+		},
+		{
+			PolicyID:    "OPE.AFFECTROWS.004",
+			Name:        "影响行数大于2w",
+			Enable:      true,
+			Type:        BasicRule,
+			RuleID:      AffectRows.ID,
+			Operator:    RuleOperatorGT,
+			Value:       20000,
+			Level:       comm.High,
+			Special:     true,
 			Priority:    70,
 			Description: "",
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.CAPACITY.001",
+			PolicyID:    "RUN.CAPACITY.001",
 			Name:        "表大小大于2G",
 			Enable:      true,
 			Type:        BasicRule,
@@ -983,7 +997,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.CAPACITY.002",
+			PolicyID:    "RUN.CAPACITY.002",
 			Name:        "表大小小于等于2G",
 			Enable:      true,
 			Type:        BasicRule,
@@ -997,7 +1011,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.CAPACITY.003",
+			PolicyID:    "RUN.CAPACITY.003",
 			Name:        "表行数小于等于10w",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1011,7 +1025,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.CAPACITY.004",
+			PolicyID:    "RUN.CAPACITY.004",
 			Name:        "表行数大于2w",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1025,7 +1039,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.CAPACITY.005",
+			PolicyID:    "RUN.CAPACITY.005",
 			Name:        "表行数小于等于2w",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1039,7 +1053,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.CAPACITY.006",
+			PolicyID:    "RUN.CAPACITY.006",
 			Name:        "磁盘容量充足",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1053,7 +1067,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.CAPACITY.007",
+			PolicyID:    "RUN.CAPACITY.007",
 			Name:        "磁盘容量不充足",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1067,7 +1081,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.TABINFO.001",
+			PolicyID:    "RUN.TABINFO.001",
 			Name:        "表存在主键",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1081,21 +1095,21 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.TABINFO.002",
+			PolicyID:    "RUN.TABINFO.002",
 			Name:        "表不存在主键",
 			Enable:      true,
 			Type:        BasicRule,
 			RuleID:      PrimaryKeyExist.ID,
 			Operator:    RuleOperatorEQ,
 			Value:       false,
-			Level:       comm.Low,
+			Level:       comm.Fatal,
 			Special:     false,
-			Priority:    10,
+			Priority:    999,
 			Description: "",
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.TABINFO.003",
+			PolicyID:    "RUN.TABINFO.003",
 			Name:        "表存在外键",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1109,7 +1123,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.TABINFO.004",
+			PolicyID:    "RUN.TABINFO.004",
 			Name:        "表不存在外键",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1123,7 +1137,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.TABINFO.005",
+			PolicyID:    "RUN.TABINFO.005",
 			Name:        "表存在触发器",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1137,7 +1151,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.TABINFO.006",
+			PolicyID:    "RUN.TABINFO.006",
 			Name:        "表不存在触发器",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1151,7 +1165,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.TABINFO.007",
+			PolicyID:    "RUN.TABINFO.007",
 			Name:        "where条件中存在索引列",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1165,7 +1179,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "RUN.TABINFO.008",
+			PolicyID:    "RUN.TABINFO.008",
 			Name:        "where条件中不存在索引列",
 			Enable:      true,
 			Type:        BasicRule,
@@ -1180,7 +1194,7 @@ func GenerateDefaultPolicy() []Policy {
 		},
 		// 聚合策略 - 按优先级
 		{
-			ID:          "AGG.RULEPRIORITY.001",
+			PolicyID:    "AGG.RULEPRIORITY.001",
 			Name:        "优先级最高的基本策略",
 			Enable:      true,
 			Type:        AggRule,
@@ -1194,7 +1208,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEPRIORITY.002",
+			PolicyID:    "AGG.RULEPRIORITY.002",
 			Name:        "优先级最低的基本策略",
 			Enable:      false,
 			Type:        AggRule,
@@ -1209,9 +1223,9 @@ func GenerateDefaultPolicy() []Policy {
 		},
 		// 聚合策略 - 按风险等级
 		{
-			ID:          "AGG.RULELEVEL.001",
+			PolicyID:    "AGG.RULELEVEL.001",
 			Name:        "风险等级最高的基本策略",
-			Enable:      true,
+			Enable:      false,
 			Type:        AggRule,
 			RuleID:      RulePriority.ID,
 			Operator:    RuleOperatorHIG,
@@ -1223,7 +1237,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULELEVEL.002",
+			PolicyID:    "AGG.RULELEVEL.002",
 			Name:        "风险等级最低的基本策略",
 			Enable:      false,
 			Type:        AggRule,
@@ -1238,7 +1252,7 @@ func GenerateDefaultPolicy() []Policy {
 		},
 		// 聚合策略 - 按匹配结果
 		{
-			ID:          "AGG.RULEMATCH.001",
+			PolicyID:    "AGG.RULEMATCH.001",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1252,7 +1266,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.002",
+			PolicyID:    "AGG.RULEMATCH.002",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1266,7 +1280,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.003",
+			PolicyID:    "AGG.RULEMATCH.003",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1280,7 +1294,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.004",
+			PolicyID:    "AGG.RULEMATCH.004",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1294,7 +1308,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.005",
+			PolicyID:    "AGG.RULEMATCH.005",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1308,7 +1322,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.006",
+			PolicyID:    "AGG.RULEMATCH.006",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1316,19 +1330,19 @@ func GenerateDefaultPolicy() []Policy {
 			Operator:    RuleOperatorALL,
 			Value:       []string{"OPE.DELETE.002", "OPE.AFFECTROWS.003"},
 			Level:       comm.Low,
-			Special:     true,
+			Special:     false,
 			Priority:    200,
 			Description: "",
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.007",
+			PolicyID:    "AGG.RULEMATCH.007",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
 			RuleID:      RuleMatch.ID,
 			Operator:    RuleOperatorALL,
-			Value:       []string{"OPE.DELETE.001", "RUN.CAPACITY.003"},
+			Value:       []string{"OPE.DELETE.001", "RUN.CAPACITY.003", "OPE.AFFECTROWS.004"},
 			Level:       comm.Low,
 			Special:     true,
 			Priority:    210,
@@ -1336,13 +1350,27 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.008",
+			PolicyID:    "AGG.RULEMATCH.008",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
 			RuleID:      RuleMatch.ID,
 			Operator:    RuleOperatorALL,
-			Value:       []string{"OPE.DELETE.001", "RUN.TABINFO.008", "RUN.CAPACITY.004"},
+			Value:       []string{"OPE.DELETE.001", "RUN.CAPACITY.003", "OPE.AFFECTROWS.003"},
+			Level:       comm.Low,
+			Special:     false,
+			Priority:    210,
+			Description: "",
+			Suggestion:  "",
+		},
+		{
+			PolicyID:    "AGG.RULEMATCH.009",
+			Name:        "",
+			Enable:      true,
+			Type:        AggRule,
+			RuleID:      RuleMatch.ID,
+			Operator:    RuleOperatorALL,
+			Value:       []string{"OPE.DELETE.001", "RUN.TABINFO.008", "OPE.AFFECTROWS.004"},
 			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
@@ -1350,7 +1378,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.009",
+			PolicyID:    "AGG.RULEMATCH.010",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1364,13 +1392,13 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.010",
+			PolicyID:    "AGG.RULEMATCH.011",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
 			RuleID:      RuleMatch.ID,
 			Operator:    RuleOperatorALL,
-			Value:       []string{"OPE.DELETE.001", "RUN.TABINFO.007", "RUN.CAPACITY.004"},
+			Value:       []string{"OPE.DELETE.001", "RUN.TABINFO.007", "OPE.AFFECTROWS.004"},
 			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
@@ -1378,7 +1406,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.011",
+			PolicyID:    "AGG.RULEMATCH.012",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1392,7 +1420,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.012",
+			PolicyID:    "AGG.RULEMATCH.013",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1406,7 +1434,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.013",
+			PolicyID:    "AGG.RULEMATCH.014",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1420,7 +1448,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.014",
+			PolicyID:    "AGG.RULEMATCH.015",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1434,13 +1462,27 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.015",
+			PolicyID:    "AGG.RULEMATCH.016",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
 			RuleID:      RuleMatch.ID,
 			Operator:    RuleOperatorALL,
-			Value:       []string{"OPE.UPDATE.001", "RUN.CAPACITY.003"},
+			Value:       []string{"OPE.UPDATE.001", "RUN.CAPACITY.003", "OPE.AFFECTROWS.004"},
+			Level:       comm.Low,
+			Special:     true,
+			Priority:    210,
+			Description: "",
+			Suggestion:  "",
+		},
+		{
+			PolicyID:    "AGG.RULEMATCH.017",
+			Name:        "",
+			Enable:      true,
+			Type:        AggRule,
+			RuleID:      RuleMatch.ID,
+			Operator:    RuleOperatorALL,
+			Value:       []string{"OPE.UPDATE.001", "RUN.CAPACITY.003", "OPE.AFFECTROWS.003"},
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    210,
@@ -1448,13 +1490,13 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.016",
+			PolicyID:    "AGG.RULEMATCH.018",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
 			RuleID:      RuleMatch.ID,
 			Operator:    RuleOperatorALL,
-			Value:       []string{"OPE.UPDATE.001", "RUN.TABINFO.008", "RUN.CAPACITY.004"},
+			Value:       []string{"OPE.UPDATE.001", "RUN.TABINFO.008", "OPE.AFFECTROWS.004"},
 			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
@@ -1462,7 +1504,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.017",
+			PolicyID:    "AGG.RULEMATCH.019",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1476,13 +1518,13 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.018",
+			PolicyID:    "AGG.RULEMATCH.020",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
 			RuleID:      RuleMatch.ID,
 			Operator:    RuleOperatorALL,
-			Value:       []string{"OPE.UPDATE.001", "RUN.TABINFO.007", "RUN.CAPACITY.004"},
+			Value:       []string{"OPE.UPDATE.001", "RUN.TABINFO.007", "OPE.AFFECTROWS.004"},
 			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
@@ -1490,7 +1532,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.019",
+			PolicyID:    "AGG.RULEMATCH.021",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1504,7 +1546,7 @@ func GenerateDefaultPolicy() []Policy {
 			Suggestion:  "",
 		},
 		{
-			ID:          "AGG.RULEMATCH.020",
+			PolicyID:    "AGG.RULEMATCH.022",
 			Name:        "",
 			Enable:      true,
 			Type:        AggRule,
@@ -1512,6 +1554,20 @@ func GenerateDefaultPolicy() []Policy {
 			Operator:    RuleOperatorALL,
 			Value:       []string{"OPE.ALTER.000", "RUN.CAPACITY.007"},
 			Level:       comm.Fatal,
+			Special:     false,
+			Priority:    200,
+			Description: "",
+			Suggestion:  "",
+		},
+		{
+			PolicyID:    "AGG.RULEMATCH.023",
+			Name:        "",
+			Enable:      true,
+			Type:        AggRule,
+			RuleID:      RuleMatch.ID,
+			Operator:    RuleOperatorALL,
+			Value:       []string{"OPE.CREATE.001", "RUN.TABINFO.001"},
+			Level:       comm.Low,
 			Special:     false,
 			Priority:    200,
 			Description: "",
@@ -1550,7 +1606,7 @@ func generatePolicyName(p Policy, policies []Policy) string {
 
 func queryPolicyNameByPolicyID(id string, policies []Policy) string {
 	for _, policy := range policies {
-		if policy.ID == id {
+		if policy.PolicyID == id {
 			return policy.Name
 		}
 	}
@@ -1567,7 +1623,7 @@ func MatchBasicPolicy(env map[string]any) (bool, []Policy, error) {
 
 		b, err := Eval(p.Expr, env)
 		if err != nil {
-			return matched, matchPolicies, fmt.Errorf("eval BasicPolicy:%s failed, %s", p.ID, err)
+			return matched, matchPolicies, fmt.Errorf("eval BasicPolicy:%s failed, %s", p.PolicyID, err)
 		}
 
 		if !b {
@@ -1599,7 +1655,7 @@ func MatchAggregatePolicy(basicPolicy []Policy) (bool, []Policy, error) {
 
 		b, err := Eval(p.Expr, env)
 		if err != nil {
-			return matched, matchPolicies, fmt.Errorf("eval AggregatePolicy:%s failed, %s", p.ID, err)
+			return matched, matchPolicies, fmt.Errorf("eval AggregatePolicy:%s failed, %s", p.PolicyID, err)
 		}
 
 		if !b {
@@ -1687,14 +1743,14 @@ func parseRuleValue(c *Policy) error {
 	if IsSliceString(value) {
 		var o any
 		if err := json.Unmarshal([]byte(value), &o); err != nil {
-			return fmt.Errorf("failed to marshal(%s), policy id:%s, %s", value, c.ID, err)
+			return fmt.Errorf("failed to marshal(%s), policy id:%s, %s", value, c.PolicyID, err)
 		}
 
 		oType := reflect.TypeOf(o)
 		oValue := reflect.ValueOf(o)
 		if oType.Kind() != reflect.Slice {
 			return fmt.Errorf("the type of rule value looks like a slice, but it is %s, policy id:%s",
-				oType.String(), c.ID)
+				oType.String(), c.PolicyID)
 		}
 
 		if oValue.Len() == 0 {
@@ -1727,7 +1783,7 @@ func parseRuleValue(c *Policy) error {
 			return nil
 		default:
 			return fmt.Errorf("the type of slice for rule value is not supported(%s), policy id:%s",
-				reflect.TypeOf(oValue.Index(0).Interface()).String(), c.ID)
+				reflect.TypeOf(oValue.Index(0).Interface()).String(), c.PolicyID)
 		}
 	}
 
@@ -1741,7 +1797,7 @@ func parseRuleValue(c *Policy) error {
 		c.Value = KeyWordType(value)
 	default:
 		c.Value = value
-		return fmt.Errorf("unknown rule value type, policy id: %s", c.ID)
+		return fmt.Errorf("unknown rule value type, policy id: %s", c.PolicyID)
 	}
 	return nil
 }
@@ -1766,15 +1822,15 @@ func GeneratePolicyExpr(polices []Policy) ([]Policy, error) {
 		case BasicRule:
 			expr, err = GenerateOneBasicPolicyExpr(p)
 			if err != nil {
-				return nil, fmt.Errorf("generate basic policy expr failed, policy id:%s, %s", p.ID, err)
+				return nil, fmt.Errorf("generate basic policy expr failed, policy id:%s, %s", p.PolicyID, err)
 			}
 		case AggRule:
 			expr, err = GenerateOneAggregatePolicyExpr(p)
 			if err != nil {
-				return nil, fmt.Errorf("generate agg policy expr failed, policy id:%s, %s", p.ID, err)
+				return nil, fmt.Errorf("generate agg policy expr failed, policy id:%s, %s", p.PolicyID, err)
 			}
 		default:
-			return nil, fmt.Errorf("unknown policy type(%s), policy id:%s", p.Type, p.ID)
+			return nil, fmt.Errorf("unknown policy type(%s), policy id:%s", p.Type, p.PolicyID)
 		}
 		newPolices[i].Expr = expr
 	}
@@ -1817,7 +1873,7 @@ func GenerateOneBasicPolicyExpr(p Policy) (string, error) {
 			return "", fmt.Errorf("OperatorType:%s only support rule value type: []int, but it is %T",
 				RuleOperatorBETWEEN, p.Value)
 		}
-		expr = fmt.Sprintf("%v <= %s && %s >= %v", v[0], p.RuleID, p.RuleID, v[1])
+		expr = fmt.Sprintf("%v <= %s && %s <= %v", v[0], p.RuleID, p.RuleID, v[1])
 	default:
 		return "", fmt.Errorf("not support operator:%s on rule type:%s", p.Operator, BasicRule)
 	}
@@ -1875,7 +1931,7 @@ func GenerateOneAggregatePolicyExpr(p Policy) (string, error) {
 
 func ValidatePolicy(p Policy) error {
 	// 判断策略ID是否合法
-	if !regexp.MustCompile(`^[A-Z]{3,}\.[A-Z]{3,}\.\d{3}$`).MatchString(p.ID) {
+	if !regexp.MustCompile(`^[A-Z]{3,}\.[A-Z]{3,}\.\d{3}$`).MatchString(p.PolicyID) {
 		return fmt.Errorf("policy id must comply with regular expressions '^[A-Z]{3,}\\.[A-Z]{3,}\\.\\d{3}$'")
 	}
 
@@ -1886,7 +1942,7 @@ func ValidatePolicy(p Policy) error {
 
 	// 判断规则类型是否合法
 	if p.Type != BasicRule && p.Type != AggRule {
-		return fmt.Errorf("policy type must in (%s,%s), policy id(%s) ", BasicRule, AggRule, p.ID)
+		return fmt.Errorf("policy type must in (%s,%s), policy id(%s) ", BasicRule, AggRule, p.PolicyID)
 	}
 
 	// 判断规则ID是否在支持列表中
@@ -1919,7 +1975,7 @@ func ValidatePolicy(p Policy) error {
 func fetchPolicyID(policies []Policy) []string {
 	s := make([]string, 0, len(policies))
 	for _, policy := range policies {
-		s = append(s, policy.ID)
+		s = append(s, policy.PolicyID)
 	}
 	return s
 }

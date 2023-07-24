@@ -2,6 +2,7 @@ package sqlrisk
 
 import (
 	"github.com/sunkaimr/sql-risk/comm"
+	"github.com/sunkaimr/sql-risk/policy"
 	"testing"
 )
 
@@ -44,5 +45,31 @@ func TestStatementSQL(t *testing.T) {
 				t.Fatalf("SplitStatement failed, got:%v, want:%v", sqlList, test.want)
 			}
 		})
+	}
+}
+
+func TestIdentifyWorkRiskPreRisk(t *testing.T) {
+	store := policy.GetStore(policy.FileStoreType, ".policy.yaml")
+	err := store.Init()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = store.PolicyWriter(policy.GenerateDefaultPolicy())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	addr := "1.2.3.4"
+	port := "3306"
+	database := "database"
+	sql := "ALTER TABLE `cowell_wxgateway`.`sms_notice_record_000` MODIFY COLUMN `phone` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '电话',ADD INDEX `idx_bi_phoneSafe_gc`(`business_id`, `phone_safe`, `gmt_create`) USING BTREE;\nupdate sms_notice_record_000 set phone = null WHERE gmt_create >='2023-04-13 00:00:00' and phone is not null and phone != ''\n"
+
+	user := "root"
+	passwd := "123456"
+
+	w := NewWorkRisk("111", addr, port, user, passwd, database, sql, nil)
+	err = w.IdentifyWorkRiskPreRisk()
+	if err != nil {
+		t.Fatalf("%v", err)
 	}
 }

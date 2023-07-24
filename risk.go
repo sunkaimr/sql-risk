@@ -37,7 +37,7 @@ type SQLRisk struct {
 
 type ErrorResult struct {
 	Type  string `json:"type"`
-	Error error  `json:"error"`
+	Error string `json:"error"`
 }
 
 type ItemValue struct {
@@ -72,6 +72,22 @@ type RiskConfig struct {
 	// 否则使用Explain获取影响行数
 	TabRowsThreshold int `json:"tab_rows_threshold"`
 	TabSizeThreshold int `json:"tab_size_threshold"`
+}
+
+func NewSqlRisk(workID, addr, port, user, passwd, database, sql string, config *Config) *SQLRisk {
+	if config == nil {
+		config = newDefaultConfig()
+	}
+	return &SQLRisk{
+		WorkID:   workID,
+		Addr:     addr,
+		Port:     port,
+		User:     user,
+		Passwd:   passwd,
+		DataBase: database,
+		SQLText:  sql,
+		Config:   config,
+	}
 }
 
 func (c *SQLRisk) IdentifyPreRisk() error {
@@ -463,9 +479,9 @@ func (c *SQLRisk) CollectAffectRows() (int, error) {
 			return 0, fmt.Errorf("get affect rows failed, %s", err)
 		}
 	} else {
-		explain, err := conn.Explain(c.SQLText)
+		explain, err := conn.Explain(selectSQL)
 		if err != nil {
-			return 0, fmt.Errorf("explain(%s) failed, %s", c.SQLText, err)
+			return 0, fmt.Errorf("explain(%s) failed, %s", selectSQL, err)
 		}
 
 		for _, v := range explain.ExplainRows {
@@ -921,7 +937,7 @@ func (c *SQLRisk) SetItemValue(name, id string, v any) {
 
 // SetItemError 记录错误信息
 func (c *SQLRisk) SetItemError(name string, e error) {
-	c.Errors = append(c.Errors, ErrorResult{Type: name, Error: e})
+	c.Errors = append(c.Errors, ErrorResult{Type: name, Error: e.Error()})
 }
 
 // SetMatchPolicies 记录匹配到的策略

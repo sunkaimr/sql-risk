@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/sunkaimr/sql-risk/comm"
+	"github.com/sunkaimr/sql-risk/policy"
 	"regexp"
 	"sort"
 	"strings"
@@ -16,19 +17,23 @@ const (
 )
 
 type WorkRisk struct {
-	WorkID     string        `gorm:"type:varchar(64);primary_key;column:work_id;comment:工单ID" json:"work_id"`
-	Addr       string        `gorm:"type:varchar(64);not null;column:addr;comment:数据源地址" json:"addr"`
-	Port       string        `gorm:"type:varchar(64);not null;column:port;comment:数据源端口" json:"port"`
-	User       string        `gorm:"type:varchar(64);not null;column:user;comment:用户名" json:"user"`
-	Passwd     string        `gorm:"-" json:"-"`
-	DataBase   string        `gorm:"type:varchar(1024);not null;column:data_base;comment:数据库名称" json:"database"`
-	TableName  string        `gorm:"type:varchar(1024);column:addr;comment:表名" json:"table_name"`
-	SQLText    string        `gorm:"type:longtext;column:sql_text;comment:SQL" json:"sql_text"`
-	SQLRisks   []SQLRisk     `gorm:"-;comment:各个SQL风险" json:"sql_risks"`
-	PreResult  PreResult     `gorm:"type:json;column:pre_result;comment:前置风险识别结果" json:"pre_result"`
-	PostResult PostResult    `gorm:"type:json;column:post_result;comment:后置风险识别结果" json:"post_result"`
-	Errors     []ErrorResult `gorm:"type:json;column:errors;comment:错误信息" json:"errors"`
-	Config     *Config       `gorm:"type:json;column:config;comment:相关配置信息" json:"config"`
+	WorkID      string          `gorm:"type:varchar(64);primary_key;column:work_id;comment:工单ID" json:"work_id"`
+	Addr        string          `gorm:"type:varchar(64);not null;column:addr;comment:数据源地址" json:"addr"`
+	Port        string          `gorm:"type:varchar(64);not null;column:port;comment:数据源端口" json:"port"`
+	User        string          `gorm:"type:varchar(64);not null;column:user;comment:用户名" json:"user"`
+	Passwd      string          `gorm:"-" json:"-"`
+	DataBase    string          `gorm:"type:varchar(1024);not null;column:data_base;comment:数据库名称" json:"database"`
+	Table       string          `gorm:"type:varchar(1024);column:addr;comment:表名" json:"table"`
+	SQLText     string          `gorm:"type:longtext;column:sql_text;comment:SQL" json:"sql_text"`
+	SQLRisks    []SQLRisk       `gorm:"-;comment:各个SQL风险" json:"sql_risks"`
+	InfoPolicy  []policy.Policy `gorm:"type:json;column:info_policy;comment:最终生效的info级别的策略" json:"info_policy"`
+	LowPolicy   []policy.Policy `gorm:"type:json;column:low_policy;comment:最终生效的low级别的策略" json:"low_policy"`
+	HighPolicy  []policy.Policy `gorm:"type:json;column:high_policy;comment:最终生效的high级别的策略" json:"high_policy"`
+	FatalPolicy []policy.Policy `gorm:"type:json;column:fatal_policy;comment:最终生效的fatal级别的策略" json:"fatal_policy"`
+	PreResult   PreResult       `gorm:"type:json;column:pre_result;comment:前置风险识别结果" json:"pre_result"`
+	PostResult  PostResult      `gorm:"type:json;column:post_result;comment:后置风险识别结果" json:"post_result"`
+	Errors      []ErrorResult   `gorm:"type:json;column:errors;comment:错误信息" json:"errors"`
+	Config      *Config         `gorm:"type:json;column:config;comment:相关配置信息" json:"config"`
 }
 
 type Config struct {
@@ -36,20 +41,19 @@ type Config struct {
 	RiskConfig RiskConfig
 }
 
-func NewWorkRisk(workID, addr, port, user, passwd, database, table, sql string, config *Config) *WorkRisk {
+func NewWorkRisk(workID, addr, port, user, passwd, database, sql string, config *Config) *WorkRisk {
 	if config == nil {
 		config = newDefaultConfig()
 	}
 	return &WorkRisk{
-		WorkID:    workID,
-		Addr:      addr,
-		Port:      port,
-		User:      user,
-		Passwd:    passwd,
-		DataBase:  database,
-		TableName: table,
-		SQLText:   sql,
-		Config:    config,
+		WorkID:   workID,
+		Addr:     addr,
+		Port:     port,
+		User:     user,
+		Passwd:   passwd,
+		DataBase: database,
+		SQLText:  sql,
+		Config:   config,
 	}
 }
 
@@ -89,7 +93,7 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 		return err
 	}
 
-	preResult := make([]PreResult, 0, len(c.SQLRisks))
+	matchedPolicies := make([]policy.Policy, 0, len(c.SQLRisks))
 	// 遍历SQL进行前置风险识别
 	for i, _ := range c.SQLRisks {
 		err = c.SQLRisks[i].IdentifyPreRisk()
@@ -99,18 +103,22 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 			c.SetItemError(IdentifyRisk, err)
 			return err
 		}
-		preResult = append(preResult, c.SQLRisks[i].PreResult)
+
+		matchedPolicies = append(matchedPolicies, c.SQLRisks[i].InfoPolicy...)
+		matchedPolicies = append(matchedPolicies, c.SQLRisks[i].LowPolicy...)
+		matchedPolicies = append(matchedPolicies, c.SQLRisks[i].HighPolicy...)
+		matchedPolicies = append(matchedPolicies, c.SQLRisks[i].FatalPolicy...)
 	}
 
-	sort.Sort(PreResultList(preResult))
-	if len(preResult) == 0 {
-		err = errors.New("no preResult found")
+	sort.Sort(policy.PoliciesListByLevel(matchedPolicies))
+	if len(matchedPolicies) == 0 {
+		err = errors.New("no matched Policies found")
 		c.SetPreResult(comm.Fatal, false)
 		c.SetItemError(IdentifyRisk, err)
 		return err
 	}
-
-	c.SetPreResult(preResult[0].Level, preResult[0].Special)
+	c.SetMatchPolicies(matchedPolicies[0])
+	c.SetPreResult(matchedPolicies[0].Level, matchedPolicies[0].Special)
 	return nil
 }
 
@@ -180,5 +188,21 @@ func (c *WorkRisk) SetPreResult(lev comm.Level, special bool) {
 
 // SetItemError 记录错误信息
 func (c *WorkRisk) SetItemError(name string, e error) {
-	c.Errors = append(c.Errors, ErrorResult{Type: name, Error: e})
+	c.Errors = append(c.Errors, ErrorResult{Type: name, Error: e.Error()})
+}
+
+// SetMatchPolicies 记录匹配到的策略
+func (c *WorkRisk) SetMatchPolicies(ps ...policy.Policy) {
+	for _, p := range ps {
+		switch p.Level {
+		case comm.Fatal:
+			c.FatalPolicy = append(c.FatalPolicy, p)
+		case comm.High:
+			c.HighPolicy = append(c.HighPolicy, p)
+		case comm.Low:
+			c.LowPolicy = append(c.LowPolicy, p)
+		case comm.Info:
+			c.InfoPolicy = append(c.InfoPolicy, p)
+		}
+	}
 }

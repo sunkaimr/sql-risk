@@ -8,19 +8,19 @@ import (
 	"path/filepath"
 )
 
-type FileStorage struct {
+type FileStore struct {
 	FilePath string
 }
 
 type PolicyYaml struct {
-	OperateTypeMeta []OperateTypeMeta
-	ActionTypeMeta  []ActionTypeMeta
-	KeyWordTypeMeta []KeyWordTypeMeta
-	RuleMeta        []RuleMeta
-	Policy          []Policy
+	OperateTypeMeta []OperateTypeMeta `yaml:"operate_type_meta"`
+	ActionTypeMeta  []ActionTypeMeta  `yaml:"action_type_meta"`
+	KeyWordTypeMeta []KeyWordTypeMeta `yaml:"key_word_type_meta"`
+	RuleMeta        []RuleMeta        `yaml:"rule_meta"`
+	Policy          []Policy          `yaml:"policy"`
 }
 
-func (c *FileStorage) Init() error {
+func (c *FileStore) Init() error {
 	path := filepath.Dir(c.FilePath)
 	if !comm.PathExist(path) {
 		err := os.MkdirAll(path, 0755)
@@ -36,7 +36,7 @@ func (c *FileStorage) Init() error {
 	return nil
 }
 
-func (c *FileStorage) PolicyReader() ([]Policy, error) {
+func (c *FileStore) PolicyReader() ([]Policy, error) {
 	data, err := os.ReadFile(c.FilePath)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (c *FileStorage) PolicyReader() ([]Policy, error) {
 	for _, p := range policies {
 		err = ValidatePolicy(p)
 		if err != nil {
-			return nil, fmt.Errorf("policy(%s) validate failed, %s", p.ID, err)
+			return nil, fmt.Errorf("policy(%s) validate failed, %s", p.PolicyID, err)
 		}
 	}
 
@@ -76,10 +76,11 @@ func (c *FileStorage) PolicyReader() ([]Policy, error) {
 	return policies, nil
 }
 
-func (c *FileStorage) PolicyWriter(policies []Policy) error {
+func (c *FileStore) PolicyWriter(policies []Policy) error {
 	var err error
 	// 生成策略名字
 	for i, p := range policies {
+		policies[i].ID = i
 		if p.Type != AggRule || p.RuleID != RuleMatch.ID || p.Name != "" {
 			continue
 		}
@@ -90,7 +91,7 @@ func (c *FileStorage) PolicyWriter(policies []Policy) error {
 	for _, p := range policies {
 		err = ValidatePolicy(p)
 		if err != nil {
-			return fmt.Errorf("policy(%s) validate failed, %s", p.ID, err)
+			return fmt.Errorf("policy(%s) validate failed, %s", p.PolicyID, err)
 		}
 	}
 
