@@ -231,3 +231,11 @@ func PathExist(path string) bool {
 	}
 	return false
 }
+
+func FileExist(file string) bool {
+	_, err := os.Stat(file)
+	if err != nil {
+		return false
+	}
+	return true
+}

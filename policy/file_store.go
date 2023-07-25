@@ -20,7 +20,12 @@ type PolicyYaml struct {
 	Policy          []Policy          `yaml:"policy"`
 }
 
+// Init
+// 1,创建相关目录
+// 2,策略文件为不存在时生成默认策略和规则相关的元数据
+// 3,策略不为空时更新规则相关的元数据
 func (c *FileStore) Init() error {
+	var err error
 	path := filepath.Dir(c.FilePath)
 	if !comm.PathExist(path) {
 		err := os.MkdirAll(path, 0755)
@@ -29,13 +34,27 @@ func (c *FileStore) Init() error {
 		}
 	}
 
-	operateTypeMeta = GenerateOperateTypeMeta()
-	actionTypeMeta = GenerateActionTypeMeta()
-	keyWordTypeMeta = GenerateKeyWordTypeMeta()
-	ruleMeta = GenerateRuleMeta()
+	if !comm.FileExist(c.FilePath) {
+		err := c.PolicyWriter(GenerateDefaultPolicy())
+		if err != nil {
+			return fmt.Errorf("write default ploicy failed, %s", err)
+		}
+		return nil
+	}
+
+	policyMeta, err = c.PolicyReader()
+	if err != nil {
+		return fmt.Errorf("read ploicy failed, %s", err)
+	}
+
+	err = c.PolicyWriter(policyMeta)
+	if err != nil {
+		return fmt.Errorf("update ploicy failed, %s", err)
+	}
 	return nil
 }
 
+// PolicyReader 从策略文件读取策略
 func (c *FileStore) PolicyReader() ([]Policy, error) {
 	data, err := os.ReadFile(c.FilePath)
 	if err != nil {
@@ -76,6 +95,7 @@ func (c *FileStore) PolicyReader() ([]Policy, error) {
 	return policies, nil
 }
 
+// PolicyWriter 将策略和规则相关的元数据写入策略文件
 func (c *FileStore) PolicyWriter(policies []Policy) error {
 	var err error
 	// 生成策略名字
@@ -108,12 +128,18 @@ func (c *FileStore) PolicyWriter(policies []Policy) error {
 	}
 	defer file.Close()
 
+	operateTypeMeta = GenerateOperateTypeMeta()
+	actionTypeMeta = GenerateActionTypeMeta()
+	keyWordTypeMeta = GenerateKeyWordTypeMeta()
+	ruleMeta = GenerateRuleMeta()
+	policyMeta = policies
+
 	policyYaml := PolicyYaml{
-		OperateTypeMeta: GenerateOperateTypeMeta(),
-		ActionTypeMeta:  GetActionTypeMeta(),
-		KeyWordTypeMeta: GenerateKeyWordTypeMeta(),
-		RuleMeta:        GenerateRuleMeta(),
-		Policy:          GetPolicy(),
+		OperateTypeMeta: operateTypeMeta,
+		ActionTypeMeta:  actionTypeMeta,
+		KeyWordTypeMeta: keyWordTypeMeta,
+		RuleMeta:        ruleMeta,
+		Policy:          policyMeta,
 	}
 	yamlData, err := yaml.Marshal(&policyYaml)
 	if err != nil {

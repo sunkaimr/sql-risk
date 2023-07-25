@@ -343,10 +343,6 @@ func TestRunSQLRisk(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = store.PolicyWriter(policy.GenerateDefaultPolicy())
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	fileName, sheet1, sheet2 := "D:/User/sunkai/Desktop/sql-test/sql-test-0724.xlsx", "筛选", "结果"
 
@@ -491,18 +487,14 @@ func TestRunOneSQLRisk(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = store.PolicyWriter(policy.GenerateDefaultPolicy())
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	addr := "10.2.16.83"
+	addr := "1.2.3.4"
 	port := "3306"
-	database := "cowell_dgms_0"
+	database := "db"
 	sql := `delete from bundling_task_store_detail;`
 
-	user := "yearning_dml"
-	passwd := "yearning_dml"
+	user := "root"
+	passwd := "123456"
 
 	//dbname := `test1`
 	//sql := "CREATE TABLE auth;"

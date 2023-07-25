@@ -62,6 +62,10 @@ func (c *Policy) AfterFind(tx *gorm.DB) error {
 	return parseRuleValue(c)
 }
 
+// Init
+// 1,创建相关表
+// 2,策略为空时生成默认策略和规则相关的元数据
+// 3,策略不为空时更新规则相关的元数据
 func (c *MysqlStore) Init() error {
 	err := c.AutoMigrate(&OperateTypeMeta{}, &ActionTypeMeta{}, &KeyWordTypeMeta{}, &RuleMeta{}, &Policy{})
 	if err != nil {
@@ -128,6 +132,7 @@ func (c *MysqlStore) Init() error {
 	return err
 }
 
+// PolicyReader 从mysql读取策略
 func (c *MysqlStore) PolicyReader() ([]Policy, error) {
 	policies := make([]Policy, 0, 100)
 	// 从数据库加载策略
@@ -163,6 +168,7 @@ func (c *MysqlStore) PolicyReader() ([]Policy, error) {
 	return policies, nil
 }
 
+// PolicyWriter 将策略和规则相关的元数据写入mysql
 func (c *MysqlStore) PolicyWriter(policies []Policy) error {
 	var err error
 	// 生成策略名字
