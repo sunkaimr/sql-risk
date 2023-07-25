@@ -1,6 +1,8 @@
 package sqlrisk
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/sunkaimr/sql-risk/comm"
@@ -205,4 +207,16 @@ func (c *WorkRisk) SetMatchPolicies(ps ...policy.Policy) {
 			c.InfoPolicy = append(c.InfoPolicy, p)
 		}
 	}
+}
+
+// String 以json格式输出
+func (c *WorkRisk) String() string {
+	buf := bytes.NewBuffer([]byte{})
+	encoder := json.NewEncoder(buf)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(c)
+	if err != nil {
+		return err.Error()
+	}
+	return buf.String()
 }

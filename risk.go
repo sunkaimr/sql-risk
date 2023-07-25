@@ -1,6 +1,8 @@
 package sqlrisk
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/pingcap/tidb/parser"
 	"github.com/pingcap/tidb/parser/ast"
@@ -166,6 +168,18 @@ func (c *SQLRisk) IdentifyPreRisk() error {
 	c.SetPreResult(matchPolicy.Level, matchPolicy.Special)
 
 	return nil
+}
+
+// String 以json格式输出
+func (c *SQLRisk) String() string {
+	buf := bytes.NewBuffer([]byte{})
+	encoder := json.NewEncoder(buf)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(c)
+	if err != nil {
+		return err.Error()
+	}
+	return buf.String()
 }
 
 func (c *SQLRisk) CollectPreRiskValues() error {
