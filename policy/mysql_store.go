@@ -122,10 +122,16 @@ func (c *MysqlStore) Init() error {
 			return err
 		}
 
+		policies, err := c.PolicyReader()
+		if err != nil {
+			return err
+		}
+
 		operateTypeMeta = operate
 		actionTypeMeta = action
 		keyWordTypeMeta = keyword
 		ruleMeta = rule
+		policyMeta = policies
 		return nil
 	})
 

@@ -15,7 +15,8 @@ import (
 )
 
 type SQLRisk struct {
-	WorkID             string          `gorm:"type:varchar(64);primary_key;column:work_id;comment:工单ID" json:"work_id"`
+	ID                 uint            `gorm:"primary_key;AUTO_INCREMENT;" json:"id"`
+	WorkID             string          `gorm:"type:varchar(64);index:work_id_idx;column:work_id;comment:工单ID" json:"work_id"`
 	Addr               string          `gorm:"type:varchar(64);not null;column:addr;comment:数据源地址" json:"addr"`
 	Port               string          `gorm:"type:varchar(64);not null;column:port;comment:数据源端口" json:"port"`
 	User               string          `gorm:"type:varchar(64);not null;column:user;comment:用户名" json:"user"`
