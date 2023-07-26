@@ -259,42 +259,58 @@ func (db *Connector) TableRows(table string) (int, error) {
 // TableConstraints 查询表包含哪些约束
 func (db *Connector) TableConstraints(d, table string) (map[string][]string, error) {
 	var err error
-	sqlQuery := fmt.Sprintf(
-		"SELECT t2.COLUMN_NAME, t1.CONSTRAINT_TYPE "+
-			"FROM "+
-			"information_schema.TABLE_CONSTRAINTS t1 "+
-			"JOIN information_schema.KEY_COLUMN_USAGE t2 ON t1.TABLE_SCHEMA = t2.TABLE_SCHEMA "+
-			"AND t1.TABLE_NAME = t2.TABLE_NAME "+
-			"AND t1.CONSTRAINT_NAME = t2.CONSTRAINT_NAME "+
-			"WHERE "+
-			"t1.TABLE_SCHEMA = '%s' "+
-			"AND t1.TABLE_NAME = '%s'", d, table)
-
-	col := make(map[string][]string, 5)
-
+	sqlQuery := fmt.Sprintf("SELECT "+
+		"CONSTRAINT_NAME, CONSTRAINT_TYPE "+
+		"FROM information_schema.TABLE_CONSTRAINTS "+
+		"WHERE "+
+		"TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'", d, table)
 	res, err := db.Query(sqlQuery)
 	if err != nil {
-		return col, fmt.Errorf("exec sql query failed, %s", err)
+		return nil, fmt.Errorf("exec sql query failed, %s", err)
+	}
+	constraint := make(map[string]string, 5)
+	constraintName, constraintType := "", ""
+	for res.Rows.Next() {
+		err = res.Rows.Scan(&constraintName, &constraintType)
+		if err != nil {
+			return nil, fmt.Errorf("scan rows failed, %s", err)
+		}
+		constraint[constraintName] = constraintType
+	}
+	err = res.Rows.Close()
+	if err != nil {
+		return nil, fmt.Errorf("close scan rows failed, %s", err)
 	}
 
-	// 解析mysql结果
-	column, constraint := "", ""
+	sqlQuery = fmt.Sprintf("SELECT "+
+		"CONSTRAINT_NAME, COLUMN_NAME "+
+		"FROM information_schema.KEY_COLUMN_USAGE "+
+		"WHERE "+
+		"TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'", d, table)
+	res, err = db.Query(sqlQuery)
+	if err != nil {
+		return nil, fmt.Errorf("exec sql query failed, %s", err)
+	}
+
+	columnName := ""
+	col := make(map[string][]string, 5)
 	for res.Rows.Next() {
-		err = res.Rows.Scan(&column, &constraint)
+		err = res.Rows.Scan(&constraintName, &columnName)
 		if err != nil {
 			return col, fmt.Errorf("scan rows failed, %s", err)
 		}
-		if _, ok := col[column]; ok {
-			col[column] = append(col[column], constraint)
+		if _, ok := col[columnName]; ok {
+			col[columnName] = append(col[columnName], constraint[constraintName])
 		} else {
-			col[column] = make([]string, 0, 1)
-			col[column] = append(col[column], constraint)
+			col[columnName] = make([]string, 0, 1)
+			col[columnName] = append(col[columnName], constraint[constraintName])
 		}
 	}
 	err = res.Rows.Close()
 	if err != nil {
 		return col, fmt.Errorf("close scan rows failed, %s", err)
 	}
+
 	return col, err
 }
 

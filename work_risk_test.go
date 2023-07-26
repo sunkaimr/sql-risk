@@ -61,8 +61,8 @@ func TestIdentifyWorkRiskPreRisk(t *testing.T) {
 
 	addr := "1.2.3.4"
 	port := "3306"
-	database := "database"
-	sql := "ALTER TABLE `cowell_wxgateway`.`sms_notice_record_000` MODIFY COLUMN `phone` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '电话',ADD INDEX `idx_bi_phoneSafe_gc`(`business_id`, `phone_safe`, `gmt_create`) USING BTREE;\nupdate sms_notice_record_000 set phone = null WHERE gmt_create >='2023-04-13 00:00:00' and phone is not null and phone != ''\n"
+	database := "isql_test"
+	sql := "update student set name = 'test' where id = 1; delete from student where id < 300;"
 
 	user := "root"
 	passwd := "123456"

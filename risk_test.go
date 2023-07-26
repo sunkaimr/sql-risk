@@ -141,9 +141,9 @@ func TestCollectAffectRows(t *testing.T) {
 			if err != nil {
 				test.input.SetItemError(policy.Action.Name, err)
 			}
-			test.input.SetItemValue(policy.Operate.Name, policy.Operate.ID, ope)
-			test.input.SetItemValue(policy.Action.Name, policy.Action.ID, act)
-			test.input.SetItemValue(policy.KeyWord.Name, policy.KeyWord.ID, keyword)
+			test.input.SetItemValue(policy.Operate.Name, policy.Operate.ID, ope, 0)
+			test.input.SetItemValue(policy.Action.Name, policy.Action.ID, act, 0)
+			test.input.SetItemValue(policy.KeyWord.Name, policy.KeyWord.ID, keyword, 0)
 
 			got, err := test.input.CollectAffectRows()
 			if err != nil {
