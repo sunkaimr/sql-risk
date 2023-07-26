@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 )
 
 const (
@@ -37,6 +38,7 @@ type WorkRisk struct {
 	PostResult  PostResult      `gorm:"type:json;column:post_result;comment:后置风险识别结果" json:"post_result"`
 	Errors      []ErrorResult   `gorm:"type:json;column:errors;comment:错误信息" json:"errors"`
 	Config      *Config         `gorm:"type:json;column:config;comment:相关配置信息" json:"config"`
+	Cost        int             `gorm:"type:int;column:cost;comment:识别工单风险花费时间" json:"cost"`
 }
 
 type Config struct {
@@ -73,6 +75,11 @@ func newDefaultConfig() *Config {
 
 // IdentifyWorkRiskPreRisk 对工单进行前置风险识别
 func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
+	start := time.Now()
+	defer func() {
+		c.Cost = int(time.Now().Sub(start).Seconds())
+	}()
+
 	// 对工单中的sql语句进行拆分
 	err := c.SplitStatement()
 	if err != nil {

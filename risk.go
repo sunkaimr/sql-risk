@@ -36,6 +36,7 @@ type SQLRisk struct {
 	PostResult         PostResult      `gorm:"type:json;column:post_result;comment:后置风险识别结果" json:"post_result"`
 	Errors             []ErrorResult   `gorm:"type:json;column:errors;comment:错误信息" json:"errors"`
 	Config             *Config         `gorm:"type:json;column:config;comment:相关配置信息" json:"config"`
+	Cost               int             `gorm:"type:int;column:cost;comment:识别SQL风险花费时间" json:"cost"`
 }
 
 type ErrorResult struct {
@@ -47,6 +48,7 @@ type ItemValue struct {
 	Name  string `json:"name"`
 	ID    string `json:"id"`
 	Value any    `json:"value"`
+	Cost  int    `json:"cost"`
 }
 
 type PreResult struct {
@@ -95,6 +97,10 @@ func NewSqlRisk(workID, addr, port, user, passwd, database, sql string, config *
 
 func (c *SQLRisk) IdentifyPreRisk() error {
 	var err error
+	start := time.Now()
+	defer func() {
+		c.Cost = int(time.Now().Sub(start).Seconds())
+	}()
 
 	if len(c.RelevantTables) == 0 {
 		c.RelevantTables, err = comm.ParseRelatedTableName(c.SQLText, c.DataBase)
@@ -184,88 +190,109 @@ func (c *SQLRisk) String() string {
 }
 
 func (c *SQLRisk) CollectPreRiskValues() error {
+	start := time.Now()
 	ope, act, keyword, err := c.CollectAction()
 	if err != nil {
 		c.SetItemError(policy.Action.Name, err)
 	}
-	c.SetItemValue(policy.Operate.Name, policy.Operate.ID, ope)
-	c.SetItemValue(policy.Action.Name, policy.Action.ID, act)
-	c.SetItemValue(policy.KeyWord.Name, policy.KeyWord.ID, keyword)
+	cost := int(time.Now().Sub(start).Seconds())
+	c.SetItemValue(policy.Operate.Name, policy.Operate.ID, ope, cost)
+	c.SetItemValue(policy.Action.Name, policy.Action.ID, act, cost)
+	c.SetItemValue(policy.KeyWord.Name, policy.KeyWord.ID, keyword, cost)
 
 	if keyword == policy.KeyWord.V.CreateTab || keyword == policy.KeyWord.V.CreateTabAs {
-		c.SetItemValue(policy.TabExist.Name, policy.TabExist.ID, false)
+		c.SetItemValue(policy.TabExist.Name, policy.TabExist.ID, false, 0)
 	} else {
+		start = time.Now()
 		exist, err := c.CollectTableExist()
+		cost = int(time.Now().Sub(start).Seconds())
 		if err != nil {
 			c.SetItemError(policy.TabExist.Name, err)
 			return err
 		}
-		c.SetItemValue(policy.TabExist.Name, policy.TabExist.ID, exist)
+		c.SetItemValue(policy.TabExist.Name, policy.TabExist.ID, exist, cost)
 	}
 
+	start = time.Now()
 	tabSize, err := c.CollectTableSize()
+	cost = int(time.Now().Sub(start).Seconds())
 	if err != nil {
 		c.SetItemError(policy.TabSize.Name, err)
 		return err
 	}
-	c.SetItemValue(policy.TabSize.Name, policy.TabSize.ID, tabSize)
+	c.SetItemValue(policy.TabSize.Name, policy.TabSize.ID, tabSize, cost)
 
+	start = time.Now()
 	tabRows, err := c.CollectTableRows()
+	cost = int(time.Now().Sub(start).Seconds())
 	if err != nil {
 		c.SetItemError(policy.TabRows.Name, err)
 		return err
 	}
-	c.SetItemValue(policy.TabRows.Name, policy.TabRows.ID, tabRows)
+	c.SetItemValue(policy.TabRows.Name, policy.TabRows.ID, tabRows, cost)
 
+	start = time.Now()
 	affectRows, err := c.CollectAffectRows()
+	cost = int(time.Now().Sub(start).Seconds())
 	if err != nil {
 		c.SetItemError(policy.AffectRows.Name, err)
 		return err
 	}
-	c.SetItemValue(policy.AffectRows.Name, policy.AffectRows.ID, affectRows)
+	c.SetItemValue(policy.AffectRows.Name, policy.AffectRows.ID, affectRows, cost)
 
+	start = time.Now()
 	freeDisk, err := c.CollectFreeDisk()
+	cost = int(time.Now().Sub(start).Seconds())
 	if err != nil {
 		c.SetItemError(policy.FreeDisk.Name, err)
 		return err
 	}
-	c.SetItemValue(policy.FreeDisk.Name, policy.FreeDisk.ID, freeDisk)
+	c.SetItemValue(policy.FreeDisk.Name, policy.FreeDisk.ID, freeDisk, cost)
 
+	start = time.Now()
 	diskStuff, err := c.CollectDiskSufficient()
+	cost = int(time.Now().Sub(start).Seconds())
 	if err != nil {
 		c.SetItemError(policy.DiskSufficient.Name, err)
 		return err
 	}
-	c.SetItemValue(policy.DiskSufficient.Name, policy.DiskSufficient.ID, diskStuff)
+	c.SetItemValue(policy.DiskSufficient.Name, policy.DiskSufficient.ID, diskStuff, cost)
 
+	start = time.Now()
 	primaryKey, err := c.CollectPrimaryKeyExist()
+	cost = int(time.Now().Sub(start).Seconds())
 	if err != nil {
 		c.SetItemError(policy.PrimaryKeyExist.Name, err)
 		return err
 	}
-	c.SetItemValue(policy.PrimaryKeyExist.Name, policy.PrimaryKeyExist.ID, primaryKey)
+	c.SetItemValue(policy.PrimaryKeyExist.Name, policy.PrimaryKeyExist.ID, primaryKey, cost)
 
+	start = time.Now()
 	foreignKey, err := c.CollectForeignKeyExist()
+	cost = int(time.Now().Sub(start).Seconds())
 	if err != nil {
 		c.SetItemError(policy.ForeignKeyExist.Name, err)
 		return err
 	}
-	c.SetItemValue(policy.ForeignKeyExist.Name, policy.ForeignKeyExist.ID, foreignKey)
+	c.SetItemValue(policy.ForeignKeyExist.Name, policy.ForeignKeyExist.ID, foreignKey, cost)
 
+	start = time.Now()
 	trigger, err := c.CollectTriggerExist()
+	cost = int(time.Now().Sub(start).Seconds())
 	if err != nil {
 		c.SetItemError(policy.TriggerExist.Name, err)
 		return err
 	}
-	c.SetItemValue(policy.TriggerExist.Name, policy.TriggerExist.ID, trigger)
+	c.SetItemValue(policy.TriggerExist.Name, policy.TriggerExist.ID, trigger, cost)
 
+	start = time.Now()
 	index, err := c.CollectIndexExistInWhere()
+	cost = int(time.Now().Sub(start).Seconds())
 	if err != nil {
 		c.SetItemError(policy.IndexExistInWhere.Name, err)
 		return err
 	}
-	c.SetItemValue(policy.IndexExistInWhere.Name, policy.IndexExistInWhere.ID, index)
-
+	c.SetItemValue(policy.IndexExistInWhere.Name, policy.IndexExistInWhere.ID, index, cost)
 	return nil
 }
 
@@ -633,11 +660,13 @@ func (c *SQLRisk) CollectDiskSufficient() (bool, error) {
 			return false, fmt.Errorf("get %s item value failed, %s(%T) not int", policy.FreeDisk.ID, policy.FreeDisk.ID, value)
 		}
 	} else {
+		start := time.Now()
 		freeDisk, err = c.CollectFreeDisk()
+		cost := int(time.Now().Sub(start).Seconds())
 		if err != nil {
 			return false, fmt.Errorf("get free disk failed, %s", err)
 		}
-		c.SetItemValue(policy.FreeDisk.Name, policy.FreeDisk.ID, freeDisk)
+		c.SetItemValue(policy.FreeDisk.Name, policy.FreeDisk.ID, freeDisk, cost)
 	}
 
 	tabSize := 0
@@ -647,11 +676,13 @@ func (c *SQLRisk) CollectDiskSufficient() (bool, error) {
 			return false, fmt.Errorf("get %s item value failed, %s(%T) not int", policy.TabSize.ID, policy.TabSize.ID, value)
 		}
 	} else {
+		start := time.Now()
 		tabSize, err = c.CollectTableSize()
+		cost := int(time.Now().Sub(start).Seconds())
 		if err != nil {
 			return false, fmt.Errorf("get table size failed, %s", err)
 		}
-		c.SetItemValue(policy.TabSize.Name, policy.TabSize.ID, tabSize)
+		c.SetItemValue(policy.TabSize.Name, policy.TabSize.ID, tabSize, cost)
 	}
 
 	return freeDisk > tabSize, nil
@@ -940,14 +971,15 @@ func (c *SQLRisk) GetItemValue(id string) any {
 }
 
 // SetItemValue 设置风险结果，如果存在就更新不存在添加
-func (c *SQLRisk) SetItemValue(name, id string, v any) {
+func (c *SQLRisk) SetItemValue(name, id string, v any, cost int) {
 	for _, item := range c.ItemValues {
 		if item.ID == id {
 			item.Value = v
+			item.Cost = cost
 			return
 		}
 	}
-	c.ItemValues = append(c.ItemValues, ItemValue{Name: name, ID: id, Value: v})
+	c.ItemValues = append(c.ItemValues, ItemValue{Name: name, ID: id, Value: v, Cost: cost})
 }
 
 // SetItemError 记录错误信息
