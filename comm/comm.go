@@ -204,8 +204,8 @@ func RemoveSQLComments(sql string) string {
 	return strings.TrimSpace(string(res))
 }
 
-// ParseRelatedTableName 提取和SQL语句所有相关的库和表
-func ParseRelatedTableName(sql string, defaultDB string) ([]string, error) {
+// ExtractingRelatedTableName 提取和SQL语句所有相关的库和表
+func ExtractingRelatedTableName(sql string, defaultDB string) ([]string, error) {
 	var tables []string
 	node, err := TiParse(sql, "", "")
 	if err != nil {
@@ -299,7 +299,7 @@ func ExtractingTableName(sql string, defaultDB string) ([]string, error) {
 		tables = append(tables, fmt.Sprintf("%s.", n.DBName))
 	// select 返回涉及到所有表
 	case *ast.SelectStmt:
-		return ParseRelatedTableName(sql, defaultDB)
+		return ExtractingRelatedTableName(sql, defaultDB)
 	// create操作
 	case *ast.CreateDatabaseStmt:
 		tables = append(tables, fmt.Sprintf("%s.", n.Name.O))

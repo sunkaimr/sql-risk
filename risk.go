@@ -25,6 +25,9 @@ type SQLRisk struct {
 	RelevantTables     []string        `gorm:"type:json;column:relevant_tables;comment:SQL语句中涉及到所有库、表" json:"relevant_tables"`
 	Tables             []string        `gorm:"type:json;column:tables;comment:SQL语句中操作的（增、删、改，查）所有库、表" json:"tables"`
 	SQLText            string          `gorm:"type:longtext;column:sql_text;comment:SQL" json:"sql_text"`
+	SQLID              string          `gorm:"type:varchar(64);column:sql_id;comment:MD5" json:"sql_id"`
+	Finger             string          `gorm:"type:varchar(1024);column:finger;comment:Finger" json:"finger"`
+	FingerID           string          `gorm:"type:varchar(64);column:finger_id;comment:FingerID" json:"finger_id"`
 	ItemValues         []ItemValue     `gorm:"type:json;column:item_values;comment:风险评估项结果" json:"item_values"`
 	MatchedBasicPolicy []policy.Policy `gorm:"type:json;column:matched_basic_policy;comment:匹配到的基本策略" json:"matched_basic_policy"`
 	MatchedAggPolicy   policy.Policy   `gorm:"type:json;column:matched_agg_policy;comment:匹配到的聚合策略" json:"matched_agg_policy"`
@@ -48,7 +51,7 @@ type ItemValue struct {
 	Name  string `json:"name"`
 	ID    string `json:"id"`
 	Value any    `json:"value"`
-	Cost  int    `json:"cost"`
+	Cost  int    `json:"cost"` // 单位ms
 }
 
 type PreResult struct {
@@ -99,21 +102,12 @@ func (c *SQLRisk) IdentifyPreRisk() error {
 	var err error
 	start := time.Now()
 	defer func() {
-		c.Cost = int(time.Now().Sub(start).Seconds())
+		c.Cost = int(time.Now().Sub(start).Milliseconds())
 	}()
 
-	if len(c.RelevantTables) == 0 {
-		c.RelevantTables, err = comm.ParseRelatedTableName(c.SQLText, c.DataBase)
-		if err != nil {
-			return fmt.Errorf("parse related table name failed, %s", err)
-		}
-	}
-
-	if len(c.Tables) == 0 {
-		c.Tables, err = comm.ExtractingTableName(c.SQLText, c.DataBase)
-		if err != nil {
-			return fmt.Errorf("extracting table name failed, %s", err)
-		}
+	err = c.SetSQLBasicInfo()
+	if err != nil {
+		return err
 	}
 
 	err = c.CollectPreRiskValues()
@@ -177,6 +171,38 @@ func (c *SQLRisk) IdentifyPreRisk() error {
 	return nil
 }
 
+// SetSQLBasicInfo 设置SQL的基本信息
+func (c *SQLRisk) SetSQLBasicInfo() error {
+	var err error
+
+	if len(c.SQLID) == 0 {
+		c.SQLID = comm.Hash(c.SQLText)
+	}
+
+	if len(c.Finger) == 0 {
+		c.Finger = comm.Finger(c.SQLText)
+	}
+
+	if len(c.FingerID) == 0 {
+		c.FingerID = comm.FingerID(c.Finger)
+	}
+
+	if len(c.RelevantTables) == 0 {
+		c.RelevantTables, err = comm.ExtractingRelatedTableName(c.SQLText, c.DataBase)
+		if err != nil {
+			return fmt.Errorf("extracting related table name failed, %s", err)
+		}
+	}
+
+	if len(c.Tables) == 0 {
+		c.Tables, err = comm.ExtractingTableName(c.SQLText, c.DataBase)
+		if err != nil {
+			return fmt.Errorf("extracting table name failed, %s", err)
+		}
+	}
+	return nil
+}
+
 // String 以json格式输出
 func (c *SQLRisk) String() string {
 	buf := bytes.NewBuffer([]byte{})
@@ -195,7 +221,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 	if err != nil {
 		c.SetItemError(policy.Action.Name, err)
 	}
-	cost := int(time.Now().Sub(start).Seconds())
+	cost := int(time.Now().Sub(start).Milliseconds())
 	c.SetItemValue(policy.Operate.Name, policy.Operate.ID, ope, cost)
 	c.SetItemValue(policy.Action.Name, policy.Action.ID, act, cost)
 	c.SetItemValue(policy.KeyWord.Name, policy.KeyWord.ID, keyword, cost)
@@ -205,7 +231,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 	} else {
 		start = time.Now()
 		exist, err := c.CollectTableExist()
-		cost = int(time.Now().Sub(start).Seconds())
+		cost = int(time.Now().Sub(start).Milliseconds())
 		if err != nil {
 			c.SetItemError(policy.TabExist.Name, err)
 			return err
@@ -215,7 +241,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 
 	start = time.Now()
 	tabSize, err := c.CollectTableSize()
-	cost = int(time.Now().Sub(start).Seconds())
+	cost = int(time.Now().Sub(start).Milliseconds())
 	if err != nil {
 		c.SetItemError(policy.TabSize.Name, err)
 		return err
@@ -224,7 +250,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 
 	start = time.Now()
 	tabRows, err := c.CollectTableRows()
-	cost = int(time.Now().Sub(start).Seconds())
+	cost = int(time.Now().Sub(start).Milliseconds())
 	if err != nil {
 		c.SetItemError(policy.TabRows.Name, err)
 		return err
@@ -233,7 +259,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 
 	start = time.Now()
 	affectRows, err := c.CollectAffectRows()
-	cost = int(time.Now().Sub(start).Seconds())
+	cost = int(time.Now().Sub(start).Milliseconds())
 	if err != nil {
 		c.SetItemError(policy.AffectRows.Name, err)
 		return err
@@ -242,7 +268,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 
 	start = time.Now()
 	freeDisk, err := c.CollectFreeDisk()
-	cost = int(time.Now().Sub(start).Seconds())
+	cost = int(time.Now().Sub(start).Milliseconds())
 	if err != nil {
 		c.SetItemError(policy.FreeDisk.Name, err)
 		return err
@@ -251,7 +277,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 
 	start = time.Now()
 	diskStuff, err := c.CollectDiskSufficient()
-	cost = int(time.Now().Sub(start).Seconds())
+	cost = int(time.Now().Sub(start).Milliseconds())
 	if err != nil {
 		c.SetItemError(policy.DiskSufficient.Name, err)
 		return err
@@ -260,7 +286,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 
 	start = time.Now()
 	primaryKey, err := c.CollectPrimaryKeyExist()
-	cost = int(time.Now().Sub(start).Seconds())
+	cost = int(time.Now().Sub(start).Milliseconds())
 	if err != nil {
 		c.SetItemError(policy.PrimaryKeyExist.Name, err)
 		return err
@@ -269,7 +295,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 
 	start = time.Now()
 	foreignKey, err := c.CollectForeignKeyExist()
-	cost = int(time.Now().Sub(start).Seconds())
+	cost = int(time.Now().Sub(start).Milliseconds())
 	if err != nil {
 		c.SetItemError(policy.ForeignKeyExist.Name, err)
 		return err
@@ -278,7 +304,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 
 	start = time.Now()
 	trigger, err := c.CollectTriggerExist()
-	cost = int(time.Now().Sub(start).Seconds())
+	cost = int(time.Now().Sub(start).Milliseconds())
 	if err != nil {
 		c.SetItemError(policy.TriggerExist.Name, err)
 		return err
@@ -287,7 +313,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 
 	start = time.Now()
 	index, err := c.CollectIndexExistInWhere()
-	cost = int(time.Now().Sub(start).Seconds())
+	cost = int(time.Now().Sub(start).Milliseconds())
 	if err != nil {
 		c.SetItemError(policy.IndexExistInWhere.Name, err)
 		return err
@@ -662,7 +688,7 @@ func (c *SQLRisk) CollectDiskSufficient() (bool, error) {
 	} else {
 		start := time.Now()
 		freeDisk, err = c.CollectFreeDisk()
-		cost := int(time.Now().Sub(start).Seconds())
+		cost := int(time.Now().Sub(start).Milliseconds())
 		if err != nil {
 			return false, fmt.Errorf("get free disk failed, %s", err)
 		}
@@ -678,7 +704,7 @@ func (c *SQLRisk) CollectDiskSufficient() (bool, error) {
 	} else {
 		start := time.Now()
 		tabSize, err = c.CollectTableSize()
-		cost := int(time.Now().Sub(start).Seconds())
+		cost := int(time.Now().Sub(start).Milliseconds())
 		if err != nil {
 			return false, fmt.Errorf("get table size failed, %s", err)
 		}

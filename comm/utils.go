@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/hmac"
+	"crypto/md5"
 	"crypto/sha256"
 	"crypto/tls"
 	"encoding/base64"
@@ -238,4 +239,10 @@ func FileExist(file string) bool {
 		return false
 	}
 	return true
+}
+
+func Hash(str string) string {
+	id := md5.New()
+	io.WriteString(id, str)
+	return fmt.Sprintf("%x", id.Sum(nil))
 }

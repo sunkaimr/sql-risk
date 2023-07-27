@@ -66,7 +66,7 @@ func TestParseRelatedTableName(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			o, err := ParseRelatedTableName(test.SQLText, test.DataBase)
+			o, err := ExtractingRelatedTableName(test.SQLText, test.DataBase)
 			if err != nil {
 				t.Fatalf("%v", err)
 			}

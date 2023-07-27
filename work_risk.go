@@ -77,15 +77,16 @@ func newDefaultConfig() *Config {
 func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 	start := time.Now()
 	defer func() {
-		c.Cost = int(time.Now().Sub(start).Seconds())
+		c.Cost = int(time.Now().Sub(start).Milliseconds())
 	}()
 
 	// 对工单中的sql语句进行拆分
 	err := c.SplitStatement()
 	if err != nil {
+		err = fmt.Errorf("split statement failed, %s", err)
 		c.SetPreResult(comm.Fatal, false)
 		c.SetItemError(ParseSQL, err)
-		return fmt.Errorf("split statement failed, %s", err)
+		return err
 	}
 
 	if len(c.SQLRisks) == 0 {
@@ -93,6 +94,15 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 		c.SetPreResult(comm.Fatal, false)
 		c.SetItemError(ParseSQL, err)
 		return err
+	}
+
+	for i, _ := range c.SQLRisks {
+		err = c.SQLRisks[i].SetSQLBasicInfo()
+		if err != nil {
+			c.SetPreResult(comm.Fatal, false)
+			c.SetItemError(ParseSQL, err)
+			return err
+		}
 	}
 
 	// 校验是否对库进行越权操作
@@ -108,7 +118,7 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 	for i, _ := range c.SQLRisks {
 		err = c.SQLRisks[i].IdentifyPreRisk()
 		if err != nil {
-			err = fmt.Errorf("identify sql pre risk failed, %s", err)
+			err = fmt.Errorf("identify sql risk failed, %s", err)
 			c.SetPreResult(comm.Fatal, false)
 			c.SetItemError(IdentifyRisk, err)
 			return err
@@ -134,8 +144,6 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 
 // SplitStatement 将多个SQL语句进行拆分
 func (c *WorkRisk) SplitStatement() error {
-	var err error
-
 	idx := strings.Index(c.SQLText, " ")
 	if idx != -1 {
 		c.SQLText = regexp.MustCompile(` `).ReplaceAllString(c.SQLText, " ")
@@ -143,7 +151,7 @@ func (c *WorkRisk) SplitStatement() error {
 	}
 
 	sqlList := comm.SplitStatement(c.SQLText)
-	for i, sql := range sqlList {
+	for _, sql := range sqlList {
 		sqlRisk := SQLRisk{
 			WorkID:   c.WorkID,
 			Addr:     c.Addr,
@@ -155,17 +163,6 @@ func (c *WorkRisk) SplitStatement() error {
 			Errors:   nil,
 			Config:   c.Config,
 		}
-
-		sqlRisk.RelevantTables, err = comm.ParseRelatedTableName(sql, c.DataBase)
-		if err != nil {
-			return fmt.Errorf("parse related table name failed, sql index(%d), %s", i, err)
-		}
-
-		sqlRisk.Tables, err = comm.ExtractingTableName(sql, c.DataBase)
-		if err != nil {
-			return fmt.Errorf("extracting table name failed,  sql index(%d), %s", i, err)
-		}
-
 		c.SQLRisks = append(c.SQLRisks, sqlRisk)
 	}
 

@@ -6,6 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/antonmedv/expr v1.12.7
 	github.com/go-sql-driver/mysql v1.7.1
+	github.com/json-iterator/go v1.1.12
 	github.com/pingcap/tidb v0.0.0-20220923141543-ecd67531f172
 	github.com/pingcap/tidb/parser v0.0.0-20220923141543-ecd67531f172
 	github.com/tidwall/gjson v1.14.4
@@ -32,6 +33,8 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/opentracing/basictracer-go v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect

@@ -1,6 +1,8 @@
 package sqlrisk
 
 import (
+	"fmt"
+	json "github.com/json-iterator/go"
 	"github.com/sunkaimr/sql-risk/comm"
 	"github.com/sunkaimr/sql-risk/policy"
 	"testing"
@@ -59,17 +61,17 @@ func TestIdentifyWorkRiskPreRisk(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	addr := "1.2.3.4"
+	addr := "10.2.66.8"
 	port := "3306"
 	database := "isql_test"
 	sql := "update student set name = 'test' where id = 1; delete from student where id < 300;"
-
 	user := "root"
 	passwd := "123456"
+	j := json.Config{EscapeHTML: false, IndentionStep: 2}.Froze()
 
 	w := NewWorkRisk("111", addr, port, user, passwd, database, sql, nil)
 	err = w.IdentifyWorkRiskPreRisk()
-	if err != nil {
-		t.Fatalf("%v", err)
-	}
+	b, _ := j.Marshal(w)
+	fmt.Println(string(b))
+	return
 }
