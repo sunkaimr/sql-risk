@@ -11,23 +11,34 @@ import (
 )
 
 const (
-	// CPU 5min内的使用率
-	cpuUsagePromQL = "avg_over_time(qce_cdb_cpuuserate_max{vip='%s'}[5m])"
-
+	// CPU 5min内的使用率(腾讯云Mysql)
+	tencentCpuUsagePromQL = "avg_over_time(qce_cdb_cpuuserate_max{vip='%s'}[5m])"
 	/*
 		https://cloud.tencent.com/document/product/248/50350#.E6.8C.87.E6.A0.87.E8.AF.B4.E6.98.8E
 		qce_cdb_volumerate_max      磁盘利用率：磁盘使用空间/实例购买空间
 		qce_cdb_capacity_max        磁盘占用空间：包括 MySQL 数据目录和  binlog、relaylog、undolog、errorlog、slowlog 日志空间
 		qce_cdb_realcapacity_max    磁盘使用空间：仅包括 MySQL 数据目录，不含 binlog、relaylog、undolog、errorlog、slowlog 日志空间
 	*/
+	// 磁盘的使用率(腾讯云Mysql)
+	tencentDiskUsagePromQL = "qce_cdb_volumerate_max{vip='%s'}"
+	// 磁盘的总大小(腾讯云Mysql)
+	tencentDiskTotalPromQL = "(qce_cdb_realcapacity_max{vip='%s'}*100)/qce_cdb_volumerate_max{vip='%s'}"
+	// 磁盘的使用空间(数据)(腾讯云Mysql)
+	tencentDiskUsedPromQL = "qce_cdb_realcapacity_max{vip='%s'}"
+	// 磁盘的剩余空间(腾讯云Mysql)
+	tencentDiskFreePromQL = "(qce_cdb_realcapacity_max{vip='%s'}*100)/qce_cdb_volumerate_max{vip='%s'}-qce_cdb_realcapacity_max{vip='%s'}"
+
+	// 自建Mysql集群
+	// CPU 5min内的使用率
+	cpuUsagePromQL = "100-(avg(rate(node_cpu_seconds_total{instance_ip='%s',mode='idle'}[5m])))*100"
 	// 磁盘的使用率
-	diskUsagePromQL = "qce_cdb_volumerate_max{vip='%s'}"
+	diskUsagePromQL = "100-(node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'})*100"
 	// 磁盘的总大小
-	diskTotalPromQL = "(qce_cdb_realcapacity_max{vip='%s'}*100)/qce_cdb_volumerate_max{vip='%s'}"
-	// 磁盘的使用空间(数据)
-	diskUsedPromQL = "qce_cdb_realcapacity_max{vip='%s'}"
+	diskTotalPromQL = "node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
+	// 磁盘的使用空间
+	diskUsedPromQL = "(node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}-node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'})/1024/1024"
 	// 磁盘的剩余空间
-	diskFreePromQL = "(qce_cdb_realcapacity_max{vip='%s'}*100)/qce_cdb_volumerate_max{vip='%s'}-qce_cdb_realcapacity_max{vip='%s'}"
+	diskFreePromQL = "node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
 )
 
 var NoDataPointError = errors.New("no data points found")
@@ -71,6 +82,69 @@ func NewClient(url string) *Client {
 	return &Client{
 		Url: url,
 	}
+}
+
+// Func 定义需要重试的函数类型
+type Func func(string, time.Time) (float64, error)
+
+// Retry 重试函数
+func Retry(fn Func, t time.Time, url ...string) (ret float64, err error) {
+	for _, u := range url {
+		ret, err = fn(u, t)
+		if err == nil {
+			return
+		}
+	}
+	return
+}
+
+func (c *Client) GeneralQuery(t time.Time, pql ...string) (float64, error) {
+	return Retry(func(pql string, t time.Time) (float64, error) {
+		vds, err := c.Query(pql, t)
+		if err != nil {
+			return 0, fmt.Errorf("query(%s) failed %s", pql, err)
+		}
+		ret, err := parseData(vds)
+		if err != nil {
+			return 0, fmt.Errorf("parse query(%s) result, %s", pql, err)
+		}
+		return ret, nil
+	}, t, pql...)
+}
+
+// CpuUsage 查询cpu的使用率
+func (c *Client) CpuUsage(vip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentCpuUsagePromQL, vip)
+	pql2 := fmt.Sprintf(cpuUsagePromQL, vip)
+	return c.GeneralQuery(t, pql1, pql2)
+}
+
+// DiskUsage 查询磁盘的使用率
+func (c *Client) DiskUsage(vip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentDiskUsagePromQL, vip)
+	pql2 := fmt.Sprintf(diskUsagePromQL, vip, vip)
+	return c.GeneralQuery(t, pql1, pql2)
+}
+
+// DiskTotal 磁盘的总大小（MB）
+func (c *Client) DiskTotal(vip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentDiskTotalPromQL, vip, vip)
+	pql2 := fmt.Sprintf(diskTotalPromQL, vip)
+	return c.GeneralQuery(t, pql1, pql2)
+}
+
+// DiskUsed 磁盘的使用大小(MB)
+func (c *Client) DiskUsed(vip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentDiskUsedPromQL, vip)
+	pql2 := fmt.Sprintf(diskUsedPromQL, vip, vip)
+	return c.GeneralQuery(t, pql1, pql2)
+}
+
+// DiskFree 磁盘剩余空间大小(MB)
+func (c *Client) DiskFree(vip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentDiskFreePromQL, vip, vip, vip)
+	pql2 := fmt.Sprintf(diskFreePromQL, vip)
+	return c.GeneralQuery(t, pql1, pql2)
 }
 
 // QueryRange 查询区间向量
@@ -123,77 +197,6 @@ func (c *Client) Query(promQL string, time time.Time) (*VectorData, error) {
 	//fmt.Printf("%s", string(body))
 	//fmt.Printf("%+v\n", result.Data.Result[0].Values)
 	return &result.Data, nil
-}
-
-// CpuUsage 查询cpu的使用率
-func (c *Client) CpuUsage(vip string, time time.Time) (float64, error) {
-	pql := fmt.Sprintf(cpuUsagePromQL, vip)
-	vds, err := c.Query(pql, time)
-	if err != nil {
-		return 0, fmt.Errorf("query(%s) failed %s", pql, err)
-	}
-	ret, err := parseData(vds)
-	if err != nil {
-		return 0, fmt.Errorf("parse query(%s) result, %s", pql, err)
-	}
-	return ret, nil
-}
-
-// DiskUsage 查询磁盘的使用率
-func (c *Client) DiskUsage(vip string, time time.Time) (float64, error) {
-	pql := fmt.Sprintf(diskUsagePromQL, vip)
-	vds, err := c.Query(pql, time)
-	if err != nil {
-		return 0, fmt.Errorf("query(%s) failed %s", pql, err)
-	}
-	ret, err := parseData(vds)
-	if err != nil {
-		return 0, fmt.Errorf("parse query(%s) result, %s", pql, err)
-	}
-	return ret, nil
-}
-
-// DiskTotal 磁盘的总大小（MB）
-func (c *Client) DiskTotal(vip string, time time.Time) (float64, error) {
-	pql := fmt.Sprintf(diskTotalPromQL, vip, vip)
-	vds, err := c.Query(pql, time)
-	if err != nil {
-		return 0, fmt.Errorf("query(%s) failed %s", pql, err)
-	}
-	ret, err := parseData(vds)
-	if err != nil {
-		return 0, fmt.Errorf("parse query(%s) result, %s", pql, err)
-	}
-	return ret, nil
-}
-
-// DiskUsed 磁盘的使用大小(MB)
-func (c *Client) DiskUsed(vip string, time time.Time) (float64, error) {
-	pql := fmt.Sprintf(diskUsedPromQL, vip)
-	vds, err := c.Query(pql, time)
-	if err != nil {
-		return 0, fmt.Errorf("query(%s) failed %s", pql, err)
-	}
-	ret, err := parseData(vds)
-	if err != nil {
-		return 0, fmt.Errorf("parse query(%s) result, %s", pql, err)
-	}
-	return ret, nil
-}
-
-// DiskFree 磁盘剩余空间大小(MB)
-func (c *Client) DiskFree(vip string, time time.Time) (float64, error) {
-	pql := fmt.Sprintf(diskFreePromQL, vip, vip, vip)
-	vds, err := c.Query(pql, time)
-	if err != nil {
-		return 0, fmt.Errorf("query(%s) failed %s", pql, err)
-	}
-
-	ret, err := parseData(vds)
-	if err != nil {
-		return 0, fmt.Errorf("parse query(%s) result, %s", pql, err)
-	}
-	return ret, nil
 }
 
 func parseData(vds *VectorData) (float64, error) {
