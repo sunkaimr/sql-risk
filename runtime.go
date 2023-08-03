@@ -31,14 +31,23 @@ const (
 	// 自建Mysql集群
 	// CPU 5min内的使用率
 	cpuUsagePromQL = "100-(avg(rate(node_cpu_seconds_total{instance_ip='%s',mode='idle'}[5m])))*100"
-	// 磁盘的使用率
+	// 磁盘的使用率（/data目录）
 	diskUsagePromQL = "100-(node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'})*100"
-	// 磁盘的总大小
+	// 磁盘的总大小（/data目录）
 	diskTotalPromQL = "node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
-	// 磁盘的使用空间
+	// 磁盘的使用空间（/data目录）
 	diskUsedPromQL = "(node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}-node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'})/1024/1024"
-	// 磁盘的剩余空间
+	// 磁盘的剩余空间（/data目录）
 	diskFreePromQL = "node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
+
+	// 磁盘的使用率（/目录）
+	diskUsagePromQL1 = "100-(node_filesystem_free_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'})*100"
+	// 磁盘的总大小 （/目录）
+	diskTotalPromQL1 = "node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/1024/1024"
+	// 磁盘的使用空间（/目录）
+	diskUsedPromQL1 = "(node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}-node_filesystem_free_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'})/1024/1024"
+	// 磁盘的剩余空间（/目录）
+	diskFreePromQL1 = "node_filesystem_free_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/1024/1024"
 )
 
 var NoDataPointError = errors.New("no data points found")
@@ -123,28 +132,32 @@ func (c *Client) CpuUsage(ip string, t time.Time) (float64, error) {
 func (c *Client) DiskUsage(ip string, t time.Time) (float64, error) {
 	pql1 := fmt.Sprintf(tencentDiskUsagePromQL, ip)
 	pql2 := fmt.Sprintf(diskUsagePromQL, ip, ip)
-	return c.GeneralQuery(t, pql1, pql2)
+	pql3 := fmt.Sprintf(diskUsagePromQL1, ip, ip)
+	return c.GeneralQuery(t, pql1, pql2, pql3)
 }
 
 // DiskTotal 磁盘的总大小（MB）
 func (c *Client) DiskTotal(ip string, t time.Time) (float64, error) {
 	pql1 := fmt.Sprintf(tencentDiskTotalPromQL, ip, ip)
 	pql2 := fmt.Sprintf(diskTotalPromQL, ip)
-	return c.GeneralQuery(t, pql1, pql2)
+	pql3 := fmt.Sprintf(diskTotalPromQL1, ip)
+	return c.GeneralQuery(t, pql1, pql2, pql3)
 }
 
 // DiskUsed 磁盘的使用大小(MB)
 func (c *Client) DiskUsed(ip string, t time.Time) (float64, error) {
 	pql1 := fmt.Sprintf(tencentDiskUsedPromQL, ip)
 	pql2 := fmt.Sprintf(diskUsedPromQL, ip, ip)
-	return c.GeneralQuery(t, pql1, pql2)
+	pql3 := fmt.Sprintf(diskUsedPromQL1, ip, ip)
+	return c.GeneralQuery(t, pql1, pql2, pql3)
 }
 
 // DiskFree 磁盘剩余空间大小(MB)
 func (c *Client) DiskFree(ip string, t time.Time) (float64, error) {
 	pql1 := fmt.Sprintf(tencentDiskFreePromQL, ip, ip, ip)
 	pql2 := fmt.Sprintf(diskFreePromQL, ip)
-	return c.GeneralQuery(t, pql1, pql2)
+	pql3 := fmt.Sprintf(diskFreePromQL, ip)
+	return c.GeneralQuery(t, pql1, pql2, pql3)
 }
 
 // QueryRange 查询区间向量
