@@ -20,25 +20,26 @@ const (
 )
 
 type WorkRisk struct {
-	ID          uint            `gorm:"primary_key;AUTO_INCREMENT;" json:"id"`
-	WorkID      string          `gorm:"type:varchar(64);index:work_id_idx;column:work_id;comment:工单ID" json:"work_id"`
-	Addr        string          `gorm:"type:varchar(64);not null;column:addr;comment:数据源地址" json:"addr"`
-	Port        string          `gorm:"type:varchar(64);not null;column:port;comment:数据源端口" json:"port"`
-	User        string          `gorm:"type:varchar(64);not null;column:user;comment:用户名" json:"user"`
-	Passwd      string          `gorm:"-" json:"-"`
-	DataBase    string          `gorm:"type:varchar(1024);not null;column:data_base;comment:数据库名称" json:"database"`
-	Table       string          `gorm:"type:varchar(1024);column:addr;comment:表名" json:"table"`
-	SQLText     string          `gorm:"type:longtext;column:sql_text;comment:SQL" json:"sql_text"`
-	SQLRisks    []SQLRisk       `gorm:"-;comment:各个SQL风险" json:"sql_risks"`
-	InfoPolicy  []policy.Policy `gorm:"type:json;column:info_policy;comment:最终生效的info级别的策略" json:"info_policy"`
-	LowPolicy   []policy.Policy `gorm:"type:json;column:low_policy;comment:最终生效的low级别的策略" json:"low_policy"`
-	HighPolicy  []policy.Policy `gorm:"type:json;column:high_policy;comment:最终生效的high级别的策略" json:"high_policy"`
-	FatalPolicy []policy.Policy `gorm:"type:json;column:fatal_policy;comment:最终生效的fatal级别的策略" json:"fatal_policy"`
-	PreResult   PreResult       `gorm:"type:json;column:pre_result;comment:前置风险识别结果" json:"pre_result"`
-	PostResult  PostResult      `gorm:"type:json;column:post_result;comment:后置风险识别结果" json:"post_result"`
-	Errors      []ErrorResult   `gorm:"type:json;column:errors;comment:错误信息" json:"errors"`
-	Config      *Config         `gorm:"type:json;column:config;comment:相关配置信息" json:"config"`
-	Cost        int             `gorm:"type:int;column:cost;comment:识别工单风险花费时间" json:"cost"`
+	ID            uint            `gorm:"primary_key;AUTO_INCREMENT;" json:"id"`
+	WorkID        string          `gorm:"type:varchar(64);index:work_id_idx;column:work_id;comment:工单ID" json:"work_id"`
+	Addr          string          `gorm:"type:varchar(64);not null;column:addr;comment:数据源地址" json:"addr"`                        // 此地址对应是集群的vip，自建集群无法根据vip查询到监控信息，所以需要配置读写库的地址
+	ReadWriteAddr string          `gorm:"type:varchar(64);not null;column:read_write_addr;comment:读写库的地址" json:"read_write_addr"` // 此地址对应是集群读写库的地址，主要用来查询监控信息
+	Port          string          `gorm:"type:varchar(64);not null;column:port;comment:数据源端口" json:"port"`
+	User          string          `gorm:"type:varchar(64);not null;column:user;comment:用户名" json:"user"`
+	Passwd        string          `gorm:"-" json:"-"`
+	DataBase      string          `gorm:"type:varchar(1024);not null;column:data_base;comment:数据库名称" json:"database"`
+	Table         string          `gorm:"type:varchar(1024);column:addr;comment:表名" json:"table"`
+	SQLText       string          `gorm:"type:longtext;column:sql_text;comment:SQL" json:"sql_text"`
+	SQLRisks      []SQLRisk       `gorm:"-;comment:各个SQL风险" json:"sql_risks"`
+	InfoPolicy    []policy.Policy `gorm:"type:json;column:info_policy;comment:最终生效的info级别的策略" json:"info_policy"`
+	LowPolicy     []policy.Policy `gorm:"type:json;column:low_policy;comment:最终生效的low级别的策略" json:"low_policy"`
+	HighPolicy    []policy.Policy `gorm:"type:json;column:high_policy;comment:最终生效的high级别的策略" json:"high_policy"`
+	FatalPolicy   []policy.Policy `gorm:"type:json;column:fatal_policy;comment:最终生效的fatal级别的策略" json:"fatal_policy"`
+	PreResult     PreResult       `gorm:"type:json;column:pre_result;comment:前置风险识别结果" json:"pre_result"`
+	PostResult    PostResult      `gorm:"type:json;column:post_result;comment:后置风险识别结果" json:"post_result"`
+	Errors        []ErrorResult   `gorm:"type:json;column:errors;comment:错误信息" json:"errors"`
+	Config        *Config         `gorm:"type:json;column:config;comment:相关配置信息" json:"config"`
+	Cost          int             `gorm:"type:int;column:cost;comment:识别工单风险花费时间" json:"cost"`
 }
 
 type Config struct {
@@ -46,19 +47,20 @@ type Config struct {
 	RiskConfig RiskConfig
 }
 
-func NewWorkRisk(workID, addr, port, user, passwd, database, sql string, config *Config) *WorkRisk {
+func NewWorkRisk(workID, addr, rwAddr, port, user, passwd, database, sql string, config *Config) *WorkRisk {
 	if config == nil {
 		config = newDefaultConfig()
 	}
 	return &WorkRisk{
-		WorkID:   workID,
-		Addr:     addr,
-		Port:     port,
-		User:     user,
-		Passwd:   passwd,
-		DataBase: database,
-		SQLText:  sql,
-		Config:   config,
+		WorkID:        workID,
+		Addr:          addr,
+		ReadWriteAddr: rwAddr,
+		Port:          port,
+		User:          user,
+		Passwd:        passwd,
+		DataBase:      database,
+		SQLText:       sql,
+		Config:        config,
 	}
 }
 
@@ -153,15 +155,16 @@ func (c *WorkRisk) SplitStatement() error {
 	sqlList := comm.SplitStatement(c.SQLText)
 	for _, sql := range sqlList {
 		sqlRisk := SQLRisk{
-			WorkID:   c.WorkID,
-			Addr:     c.Addr,
-			Port:     c.Port,
-			User:     c.User,
-			Passwd:   c.Passwd,
-			DataBase: c.DataBase,
-			SQLText:  sql,
-			Errors:   nil,
-			Config:   c.Config,
+			WorkID:        c.WorkID,
+			Addr:          c.Addr,
+			ReadWriteAddr: c.ReadWriteAddr,
+			Port:          c.Port,
+			User:          c.User,
+			Passwd:        c.Passwd,
+			DataBase:      c.DataBase,
+			SQLText:       sql,
+			Errors:        nil,
+			Config:        c.Config,
 		}
 		c.SQLRisks = append(c.SQLRisks, sqlRisk)
 	}

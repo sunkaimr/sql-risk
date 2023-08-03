@@ -17,7 +17,8 @@ import (
 type SQLRisk struct {
 	ID                 uint            `gorm:"primary_key;AUTO_INCREMENT;" json:"id"`
 	WorkID             string          `gorm:"type:varchar(64);index:work_id_idx;column:work_id;comment:工单ID" json:"work_id"`
-	Addr               string          `gorm:"type:varchar(64);not null;column:addr;comment:数据源地址" json:"addr"`
+	Addr               string          `gorm:"type:varchar(64);not null;column:addr;comment:数据源地址" json:"addr"`                        // 此地址对应是集群的vip，自建集群无法根据vip查询到监控信息，所以需要配置读写库的地址
+	ReadWriteAddr      string          `gorm:"type:varchar(64);not null;column:read_write_addr;comment:读写库的地址" json:"read_write_addr"` // 此地址对应是集群读写库的地址，主要用来查询监控信息
 	Port               string          `gorm:"type:varchar(64);not null;column:port;comment:数据源端口" json:"port"`
 	User               string          `gorm:"type:varchar(64);not null;column:user;comment:用户名" json:"user"`
 	Passwd             string          `gorm:"-" json:"-"`
@@ -82,19 +83,20 @@ type RiskConfig struct {
 	TabSizeThreshold int `json:"tab_size_threshold"`
 }
 
-func NewSqlRisk(workID, addr, port, user, passwd, database, sql string, config *Config) *SQLRisk {
+func NewSqlRisk(workID, addr, rwAddr, port, user, passwd, database, sql string, config *Config) *SQLRisk {
 	if config == nil {
 		config = newDefaultConfig()
 	}
 	return &SQLRisk{
-		WorkID:   workID,
-		Addr:     addr,
-		Port:     port,
-		User:     user,
-		Passwd:   passwd,
-		DataBase: database,
-		SQLText:  sql,
-		Config:   config,
+		WorkID:        workID,
+		Addr:          addr,
+		ReadWriteAddr: rwAddr,
+		Port:          port,
+		User:          user,
+		Passwd:        passwd,
+		DataBase:      database,
+		SQLText:       sql,
+		Config:        config,
 	}
 }
 
@@ -661,14 +663,19 @@ func (c *SQLRisk) CollectTableRows() (int, error) {
 
 // CollectFreeDisk 剩余磁盘空间
 func (c *SQLRisk) CollectFreeDisk() (int, error) {
-	disk, err := NewClient(c.Config.Runtime.Url).DiskFree(c.Addr, time.Now())
+	addr := c.Addr
+	if c.ReadWriteAddr != "" {
+		addr = c.ReadWriteAddr
+	}
+
+	disk, err := NewClient(c.Config.Runtime.Url).DiskFree(addr, time.Now())
 	if err == nil {
 		return int(disk), nil
 	}
 
 	if strings.Contains(err.Error(), NoDataPointError.Error()) {
 		// 找不到数据，向前提5min再试一次
-		disk, err = NewClient(c.Config.Runtime.Url).DiskFree(c.Addr, time.Now().Add(-5*time.Minute))
+		disk, err = NewClient(c.Config.Runtime.Url).DiskFree(addr, time.Now().Add(-5*time.Minute))
 		if err != nil {
 			return 0, err
 		}
@@ -716,14 +723,18 @@ func (c *SQLRisk) CollectDiskSufficient() (bool, error) {
 
 // CollectCpuUsage CPU使用率
 func (c *SQLRisk) CollectCpuUsage() (int, error) {
-	cpu, err := NewClient(c.Config.Runtime.Url).CpuUsage(c.Addr, time.Now())
+	addr := c.Addr
+	if c.ReadWriteAddr != "" {
+		addr = c.ReadWriteAddr
+	}
+	cpu, err := NewClient(c.Config.Runtime.Url).CpuUsage(addr, time.Now())
 	if err == nil {
 		return int(cpu), nil
 	}
 
 	if strings.Contains(err.Error(), NoDataPointError.Error()) {
 		// 找不到数据，向前提5min再试一次
-		cpu, err = NewClient(c.Config.Runtime.Url).CpuUsage(c.Addr, time.Now().Add(time.Minute*-5))
+		cpu, err = NewClient(c.Config.Runtime.Url).CpuUsage(addr, time.Now().Add(time.Minute*-5))
 		if err != nil {
 			return 0, err
 		}

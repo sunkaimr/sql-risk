@@ -113,37 +113,37 @@ func (c *Client) GeneralQuery(t time.Time, pql ...string) (float64, error) {
 }
 
 // CpuUsage 查询cpu的使用率
-func (c *Client) CpuUsage(vip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentCpuUsagePromQL, vip)
-	pql2 := fmt.Sprintf(cpuUsagePromQL, vip)
+func (c *Client) CpuUsage(ip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentCpuUsagePromQL, ip)
+	pql2 := fmt.Sprintf(cpuUsagePromQL, ip)
 	return c.GeneralQuery(t, pql1, pql2)
 }
 
 // DiskUsage 查询磁盘的使用率
-func (c *Client) DiskUsage(vip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentDiskUsagePromQL, vip)
-	pql2 := fmt.Sprintf(diskUsagePromQL, vip, vip)
+func (c *Client) DiskUsage(ip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentDiskUsagePromQL, ip)
+	pql2 := fmt.Sprintf(diskUsagePromQL, ip, ip)
 	return c.GeneralQuery(t, pql1, pql2)
 }
 
 // DiskTotal 磁盘的总大小（MB）
-func (c *Client) DiskTotal(vip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentDiskTotalPromQL, vip, vip)
-	pql2 := fmt.Sprintf(diskTotalPromQL, vip)
+func (c *Client) DiskTotal(ip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentDiskTotalPromQL, ip, ip)
+	pql2 := fmt.Sprintf(diskTotalPromQL, ip)
 	return c.GeneralQuery(t, pql1, pql2)
 }
 
 // DiskUsed 磁盘的使用大小(MB)
-func (c *Client) DiskUsed(vip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentDiskUsedPromQL, vip)
-	pql2 := fmt.Sprintf(diskUsedPromQL, vip, vip)
+func (c *Client) DiskUsed(ip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentDiskUsedPromQL, ip)
+	pql2 := fmt.Sprintf(diskUsedPromQL, ip, ip)
 	return c.GeneralQuery(t, pql1, pql2)
 }
 
 // DiskFree 磁盘剩余空间大小(MB)
-func (c *Client) DiskFree(vip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentDiskFreePromQL, vip, vip, vip)
-	pql2 := fmt.Sprintf(diskFreePromQL, vip)
+func (c *Client) DiskFree(ip string, t time.Time) (float64, error) {
+	pql1 := fmt.Sprintf(tencentDiskFreePromQL, ip, ip, ip)
+	pql2 := fmt.Sprintf(diskFreePromQL, ip)
 	return c.GeneralQuery(t, pql1, pql2)
 }
 
