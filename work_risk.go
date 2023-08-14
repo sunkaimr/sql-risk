@@ -43,8 +43,8 @@ type WorkRisk struct {
 }
 
 type Config struct {
-	Runtime    Client
-	RiskConfig RiskConfig
+	Runtime    Client     `json:"runtime"`
+	RiskConfig RiskConfig `json:"risk_config"`
 }
 
 func NewWorkRisk(workID, addr, rwAddr, port, user, passwd, database, sql string, config *Config) *WorkRisk {
