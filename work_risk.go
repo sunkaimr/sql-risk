@@ -132,6 +132,17 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 		matchedPolicies = append(matchedPolicies, c.SQLRisks[i].FatalPolicy...)
 	}
 
+	operate := make(map[string]struct{})
+	for i, _ := range c.SQLRisks {
+		o := c.SQLRisks[i].GetItemValue(policy.Operate.ID).(string)
+		operate[o] = struct{}{}
+	}
+	if len(operate) > 1 {
+		err = errors.New("")
+		c.SetPreResult(comm.Fatal, false)
+		c.SetItemError(Authority, err)
+	}
+
 	sort.Sort(policy.PoliciesListByLevel(matchedPolicies))
 	if len(matchedPolicies) == 0 {
 		err = errors.New("no matched Policies found")
