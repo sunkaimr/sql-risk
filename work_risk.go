@@ -132,16 +132,17 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 		matchedPolicies = append(matchedPolicies, c.SQLRisks[i].FatalPolicy...)
 	}
 
-	operate := make(map[string]struct{})
-	for i, _ := range c.SQLRisks {
-		o := c.SQLRisks[i].GetItemValue(policy.Operate.ID).(string)
-		operate[o] = struct{}{}
-	}
-	if len(operate) > 1 {
-		err = errors.New("")
-		c.SetPreResult(comm.Fatal, false)
-		c.SetItemError(Authority, err)
-	}
+	// 一个工单只能包含一种操作类型
+	//operate := make(map[string]struct{})
+	//for i, _ := range c.SQLRisks {
+	//	o := fmt.Sprintf("%v", c.SQLRisks[i].GetItemValue(policy.Operate.ID))
+	//	operate[o] = struct{}{}
+	//}
+	//if len(operate) > 1 {
+	//	err = errors.New("")
+	//	c.SetPreResult(comm.Fatal, false)
+	//	c.SetItemError(Authority, err)
+	//}
 
 	sort.Sort(policy.PoliciesListByLevel(matchedPolicies))
 	if len(matchedPolicies) == 0 {
