@@ -263,7 +263,9 @@ func ExtractingRelatedTableName(sql string, defaultDB string) ([]string, error) 
 		// DDL: DROP|CREATE DATABASE
 		schemas := JSONFind(jsonString, "Name")
 		for _, schema := range schemas {
-			tables = append(tables, fmt.Sprintf("%s.", schema))
+			for _, t := range JSONFind(schema, "O") {
+				tables = append(tables, fmt.Sprintf("%s.", t))
+			}
 		}
 	default:
 		// DDL: CREATE TABLE|DATABASE|INDEX|VIEW, DROP INDEX

@@ -30,6 +30,14 @@ func TestStatementSQL(t *testing.T) {
 			},
 			want: []string{"update  t_prod_contract_card_info set usable_flag = 'UN_USABLE' where id in ( '3825169', '3825170', '3825171')"},
 		},
+		{
+			name: "test003",
+			wr: WorkRisk{
+				DataBase: "isql_test",
+				SQLText:  `DROP DATABASE isql_test`,
+			},
+			want: []string{"update t_prod_contract_card_info set usable_flag = 'UN_USABLE' where id in ( '3825169', '3825170', '3825171')"},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -69,7 +77,7 @@ func TestIdentifyWorkRiskPreRisk(t *testing.T) {
 	passwd := "123456"
 	j := json.Config{EscapeHTML: false, IndentionStep: 2}.Froze()
 
-	w := NewWorkRisk("111", addr, port, user, passwd, database, sql, nil)
+	w := NewWorkRisk("111", addr, "", port, user, passwd, database, sql, nil)
 	err = w.IdentifyWorkRiskPreRisk()
 	b, _ := j.Marshal(w)
 	fmt.Println(string(b))
