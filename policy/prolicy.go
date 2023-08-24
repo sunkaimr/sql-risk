@@ -1399,7 +1399,7 @@ func GenerateDefaultPolicy() []Policy {
 			RuleID:      RuleMatch.ID,
 			Operator:    RuleOperatorALL,
 			Value:       []string{"OPE.DELETE.001", "RUN.TABINFO.007", "OPE.AFFECTROWS.004"},
-			Level:       comm.High,
+			Level:       comm.Low,
 			Special:     true,
 			Priority:    200,
 			Description: "",
