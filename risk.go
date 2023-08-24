@@ -228,7 +228,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 	c.SetItemValue(policy.Action.Name, policy.Action.ID, act, cost)
 	c.SetItemValue(policy.KeyWord.Name, policy.KeyWord.ID, keyword, cost)
 
-	if keyword == policy.KeyWord.V.CreateTab || keyword == policy.KeyWord.V.CreateTabAs {
+	if keyword == policy.KeyWord.V.CreateTab || keyword == policy.KeyWord.V.CreateTabAs || keyword == policy.KeyWord.V.CreateTmpTab {
 		c.SetItemValue(policy.TabExist.Name, policy.TabExist.ID, false, 0)
 	} else {
 		start = time.Now()
