@@ -30,8 +30,8 @@ type WorkRisk struct {
 	DataBase      string          `gorm:"type:varchar(1024);not null;column:data_base;comment:数据库名称" json:"database"`
 	Table         string          `gorm:"type:varchar(1024);column:addr;comment:表名" json:"table"`
 	SQLText       string          `gorm:"type:longtext;column:sql_text;comment:SQL" json:"sql_text"`
-	SQLRisks      []*SQLRisk      `gorm:"-;comment:各个SQL风险" json:"sql_risks"`
 	Summary       Summary         `gorm:"type:json;column:summary;comment:工单概要信息" json:"summary"`
+	SQLRisks      []*SQLRisk      `gorm:"-;comment:各个SQL风险" json:"sql_risks"`
 	InfoPolicy    []policy.Policy `gorm:"type:json;column:info_policy;comment:最终生效的info级别的策略" json:"info_policy"`
 	LowPolicy     []policy.Policy `gorm:"type:json;column:low_policy;comment:最终生效的low级别的策略" json:"low_policy"`
 	HighPolicy    []policy.Policy `gorm:"type:json;column:high_policy;comment:最终生效的high级别的策略" json:"high_policy"`
@@ -269,7 +269,11 @@ func (c *WorkRisk) SampDetectForInsert() *WorkRisk {
 	m := make(map[string]struct{}, len(c.SQLRisks))
 	deleteItem := make([]int, 0, len(c.SQLRisks))
 	for i, r := range c.SQLRisks {
-		if _, ok := m[r.FingerID]; !ok && r.JudgeItemValue(policy.KeyWord.ID, policy.KeyWord.V.Insert) {
+		if !r.JudgeItemValue(policy.KeyWord.ID, policy.KeyWord.V.Insert) {
+			continue
+		}
+
+		if _, ok := m[r.FingerID]; !ok {
 			m[r.FingerID] = struct{}{}
 		} else {
 			deleteItem = append(deleteItem, i)
