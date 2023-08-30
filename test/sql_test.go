@@ -159,7 +159,7 @@ func TestIdentifySQLFinger(t *testing.T) {
 
 		sqlFinger := comm.Finger(sql)
 		//c := &sqlrisk.SQLRisk{SQLText: sql}
-		c := sqlrisk.NewSqlRisk("", "", "", "", "", "", sql, nil)
+		c := sqlrisk.NewSqlRisk("", "", "", "", "", "", "", sql, nil)
 		ope, act, keyword, err := c.CollectAction()
 		if err != nil {
 			fmt.Printf("collect action failed, %s\n", err)
@@ -193,7 +193,7 @@ func TestIdentifySQLFinger(t *testing.T) {
 		}
 
 		sqlFinger := comm.Finger(sql)
-		c := sqlrisk.NewSqlRisk("", "", "", "", "", "", sql, nil)
+		c := sqlrisk.NewSqlRisk("", "", "", "", "", "", "", sql, nil)
 		ope, act, keyword, err := c.CollectAction()
 		if err != nil {
 			fmt.Printf("collect action failed, %s\n", err)
@@ -411,7 +411,7 @@ func TestRunSQLRisk(t *testing.T) {
 			fmt.Printf("GetDBAddrByDBName err: %s\n", err)
 			continue
 		}
-		r := sqlrisk.NewSqlRisk("", addr, port, user, passwd, database, sql, nil)
+		r := sqlrisk.NewSqlRisk("", addr, "", port, user, passwd, database, sql, nil)
 		err = r.IdentifyPreRisk()
 		if err != nil {
 			r.SetItemError(sqlrisk.IdentifyRisk, err)
@@ -482,7 +482,7 @@ func TestRunSQLRisk(t *testing.T) {
 }
 
 func TestRunOneSQLRisk(t *testing.T) {
-	store := policy.GetStore(policy.FileStoreType, ".policy.yaml")
+	store := policy.GetStore(policy.FileStoreType, "policy.yaml")
 	err := store.Init()
 	if err != nil {
 		t.Fatal(err)
@@ -503,7 +503,7 @@ func TestRunOneSQLRisk(t *testing.T) {
 	//	t.Fatalf("GetDBAddrByDBName err: %s", err)
 	//}
 
-	r := sqlrisk.NewSqlRisk("", addr, port, user, passwd, database, sql, nil)
+	r := sqlrisk.NewSqlRisk("", addr, "", port, user, passwd, database, sql, nil)
 	err = r.IdentifyPreRisk()
 	if err != nil {
 		t.Fatalf("IdentifyPreRisk err: %s", err)

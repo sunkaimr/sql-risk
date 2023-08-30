@@ -54,7 +54,7 @@ var NoDataPointError = errors.New("no data points found")
 
 type Client struct {
 	// 	http://thanos-realtime.xxx.com
-	Url string
+	Url string `json:"url"`
 }
 
 type MatrixResult struct {

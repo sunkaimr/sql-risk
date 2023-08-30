@@ -1,0 +1,1675 @@
+operate_type_meta:
+    - id: Unknown
+      value: UNKNOWN
+    - id: DQL
+      value: DQL
+    - id: DDL
+      value: DDL
+    - id: DML
+      value: DML
+    - id: DCL
+      value: DCL
+action_type_meta:
+    - id: Unknown
+      value: unknown
+    - id: Select
+      value: select
+    - id: Drop
+      value: drop
+    - id: Truncate
+      value: truncate
+    - id: Create
+      value: create
+    - id: Alter
+      value: alter
+    - id: Insert
+      value: insert
+    - id: Replace
+      value: replace
+    - id: Delete
+      value: delete
+    - id: Update
+      value: update
+key_word_type_meta:
+    - id: Unknown
+      value: unknown
+    - id: Select
+      value: select
+    - id: DropTab
+      value: drop table
+    - id: DropDB
+      value: drop database
+    - id: DropIdx
+      value: drop index
+    - id: DropProcedure
+      value: drop procedure
+    - id: DropFun
+      value: drop function
+    - id: DropView
+      value: drop view
+    - id: DropTrig
+      value: drop trigger
+    - id: TruncateTab
+      value: truncate table
+    - id: CreateTab
+      value: create table
+    - id: CreateTabAs
+      value: create table as
+    - id: CreateTmpTab
+      value: create temporary table
+    - id: CreateIdx
+      value: create index
+    - id: CreateUniIdx
+      value: create unique index
+    - id: CreateProcedure
+      value: create procedure
+    - id: CreateFunc
+      value: create function
+    - id: CreateView
+      value: create view
+    - id: CreateTrig
+      value: create trigger
+    - id: AlertAddCol
+      value: alter add column
+    - id: AlertDropCol
+      value: alter drop column
+    - id: AlertModCol
+      value: alter modify column
+    - id: AlertRenameCol
+      value: alter rename column
+    - id: AlertChgCol
+      value: alter change column
+    - id: AlertAddPriKey
+      value: alter add primary key
+    - id: AlertDropPriKey
+      value: alter drop primary key
+    - id: AlertAddIdx
+      value: alter add index
+    - id: AlertAddUni
+      value: alter add unique
+    - id: AlertAddUniIdx
+      value: alter add unique index
+    - id: AlertDropIdx
+      value: alter drop index
+    - id: Alter
+      value: alter
+    - id: InsertSelect
+      value: insert into select
+    - id: Insert
+      value: insert
+    - id: Replace
+      value: replace into
+    - id: DeleteWhere
+      value: delete from where
+    - id: Delete
+      value: delete from
+    - id: UpdateWhere
+      value: update set where
+    - id: Update
+      value: update set
+rule_meta:
+    - id: Operate
+      name: 操作类型
+      type: BASIC
+      value_type: OperateType
+      operator:
+        - ==
+        - '!='
+      description: SQL的操作类型
+    - id: Action
+      name: 动作类型
+      type: BASIC
+      value_type: ActionType
+      operator:
+        - ==
+        - '!='
+      description: SQL的动作类型
+    - id: KeyWord
+      name: 关键字
+      type: BASIC
+      value_type: KeyWordType
+      operator:
+        - ==
+        - '!='
+      description: SQL的关键字
+    - id: TableSize
+      name: 表大小
+      type: BASIC
+      value_type: INT
+      operator:
+        - <
+        - <=
+        - '>'
+        - '>='
+        - between
+      description: 表大小
+    - id: TableRows
+      name: 表数据量
+      type: BASIC
+      value_type: INT
+      operator:
+        - <
+        - <=
+        - '>'
+        - '>='
+        - between
+      description: 表行数
+    - id: AffectRows
+      name: 影响行数
+      type: BASIC
+      value_type: INT
+      operator:
+        - <
+        - <=
+        - '>'
+        - '>='
+        - between
+      description: 评估delete和update操作的影响行数
+    - id: DiskSufficient
+      name: 磁盘充足
+      type: BASIC
+      value_type: BOOL
+      operator:
+        - ==
+        - '!='
+      description: 判断磁盘剩余空间是否大于表大小，评估磁盘剩余空间是否支持DDL操作
+    - id: PrimaryKeyExist
+      name: 存在主键
+      type: BASIC
+      value_type: BOOL
+      operator:
+        - ==
+        - '!='
+      description: 判断表是否存在主键
+    - id: ForeignKeyExist
+      name: 存在外键
+      type: BASIC
+      value_type: BOOL
+      operator:
+        - ==
+        - '!='
+      description: 判断表是否存在外键
+    - id: TriggerExist
+      name: 存在触发器
+      type: BASIC
+      value_type: BOOL
+      operator:
+        - ==
+        - '!='
+      description: 判断表是否存在触发器
+    - id: IndexExistInWhere
+      name: where条件中存在索引列
+      type: BASIC
+      value_type: BOOL
+      operator:
+        - ==
+        - '!='
+      description: 判断delete和update操作时where条件后边的列是否是索引
+    - id: BigTransaction
+      name: 大事务
+      type: BASIC
+      value_type: BOOL
+      operator:
+        - ==
+        - '!='
+      description: 判断操作的表是否有正在运行的事务
+    - id: CpuUsage
+      name: CPU使用率
+      type: BASIC
+      value_type: INT
+      operator:
+        - <
+        - <=
+        - '>'
+        - '>='
+        - between
+      description: 获取当前集群最近5分钟内CPU的使用率
+    - id: RuleMatch
+      name: 匹配规则名称
+      type: AGG
+      value_type: BASIC
+      operator:
+        - all
+        - any
+      description: 判断匹配到的BASIC规则名称
+    - id: RulePriority
+      name: 匹配规则优先级
+      type: AGG
+      value_type: BASIC
+      operator:
+        - highest
+        - lowest
+      description: 按优先级取匹配到的BASIC规则
+    - id: RuleLevel
+      name: 匹配规则风险等级
+      type: AGG
+      value_type: BASIC
+      operator:
+        - highest
+        - lowest
+      description: 按风险等级取匹配到的BASIC规则
+policy:
+    - id: 0
+      policy_id: OPE.UNKNOWN.000
+      name: 未知的动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: unknown
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "unknown"
+    - id: 1
+      policy_id: OPE.SELECT.000
+      name: SELECT动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: select
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "select"
+    - id: 2
+      policy_id: OPE.DROP.000
+      name: DROP动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: drop
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "drop"
+    - id: 3
+      policy_id: OPE.TRUNCATE.000
+      name: TRUNCATE动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: truncate
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "truncate"
+    - id: 4
+      policy_id: OPE.CREATE.000
+      name: CREATE动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: create
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "create"
+    - id: 5
+      policy_id: OPE.ALTER.000
+      name: ALTER动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: alter
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "alter"
+    - id: 6
+      policy_id: OPE.INSERT.000
+      name: INSERT动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: insert
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "insert"
+    - id: 7
+      policy_id: OPE.REPLACE.000
+      name: REPLACE动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: replace
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "replace"
+    - id: 8
+      policy_id: OPE.DELETE.000
+      name: DELETE动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: delete
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "delete"
+    - id: 9
+      policy_id: OPE.UPDATE.000
+      name: UPDATE动作类型
+      type: BASIC
+      enable: true
+      rule_id: Action
+      operator: ==
+      value: update
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: Action == "update"
+    - id: 10
+      policy_id: OPE.UNKNOWN.001
+      name: 未知的关键字
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: unknown
+      level: low
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "unknown"
+    - id: 11
+      policy_id: OPE.SELECT.001
+      name: 查询
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: select
+      level: low
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "select"
+    - id: 12
+      policy_id: OPE.DROP.001
+      name: 删除表
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: drop table
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "drop table"
+    - id: 13
+      policy_id: OPE.DROP.002
+      name: 删除数据库
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: drop database
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "drop database"
+    - id: 14
+      policy_id: OPE.DROP.003
+      name: 删除索引
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: drop index
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "drop index"
+    - id: 15
+      policy_id: OPE.DROP.004
+      name: 删除存储过程
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: drop procedure
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "drop procedure"
+    - id: 16
+      policy_id: OPE.DROP.005
+      name: 删除函数
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: drop function
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "drop function"
+    - id: 17
+      policy_id: OPE.DROP.006
+      name: 删除视图
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: drop view
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "drop view"
+    - id: 18
+      policy_id: OPE.DROP.007
+      name: 删除触发器
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: drop trigger
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "drop trigger"
+    - id: 19
+      policy_id: OPE.TRUNCATE.001
+      name: 截断表
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: truncate table
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "truncate table"
+    - id: 20
+      policy_id: OPE.CREATE.001
+      name: 创建表
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: create table
+      level: low
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "create table"
+    - id: 21
+      policy_id: OPE.CREATE.002
+      name: 复制表
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: create table as
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "create table as"
+    - id: 22
+      policy_id: OPE.CREATE.003
+      name: 创建临时表
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: create temporary table
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "create temporary table"
+    - id: 23
+      policy_id: OPE.CREATE.004
+      name: 创建索引
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: create index
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "create index"
+    - id: 24
+      policy_id: OPE.CREATE.005
+      name: 创建唯一索引
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: create unique index
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "create unique index"
+    - id: 25
+      policy_id: OPE.CREATE.006
+      name: 创建存储过程
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: create procedure
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "create procedure"
+    - id: 26
+      policy_id: OPE.CREATE.007
+      name: 创建函数
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: create function
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "create function"
+    - id: 27
+      policy_id: OPE.CREATE.008
+      name: 创建视图
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: create view
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "create view"
+    - id: 28
+      policy_id: OPE.CREATE.009
+      name: 创建触发器
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: create trigger
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "create trigger"
+    - id: 29
+      policy_id: OPE.ALTER.001
+      name: alter操作
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter"
+    - id: 30
+      policy_id: OPE.ALTER.002
+      name: 添加列
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter add column
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter add column"
+    - id: 31
+      policy_id: OPE.ALTER.003
+      name: 删除列
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter drop column
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter drop column"
+    - id: 32
+      policy_id: OPE.ALTER.004
+      name: 更新列
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter modify column
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter modify column"
+    - id: 33
+      policy_id: OPE.ALTER.005
+      name: 列重命名
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter rename column
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter rename column"
+    - id: 34
+      policy_id: OPE.ALTER.006
+      name: 修改列
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter change column
+      level: high
+      special: false
+      priority: 50
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter change column"
+    - id: 35
+      policy_id: OPE.ALTER.007
+      name: 添加主键
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter add primary key
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter add primary key"
+    - id: 36
+      policy_id: OPE.ALTER.008
+      name: 删除主键
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter drop primary key
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter drop primary key"
+    - id: 37
+      policy_id: OPE.ALTER.009
+      name: 添加索引
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter add index
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter add index"
+    - id: 38
+      policy_id: OPE.ALTER.010
+      name: 添加唯一约束
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter add unique
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter add unique"
+    - id: 39
+      policy_id: OPE.ALTER.011
+      name: 添加唯一索引
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: alter add unique index
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "alter add unique index"
+    - id: 40
+      policy_id: OPE.ALTER.012
+      name: 删除索引
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: drop index
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "drop index"
+    - id: 41
+      policy_id: OPE.INSERT.001
+      name: 插入数据
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: insert
+      level: low
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "insert"
+    - id: 42
+      policy_id: OPE.INSERT.002
+      name: 插入查询数据
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: insert into select
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "insert into select"
+    - id: 43
+      policy_id: OPE.REPLACE.003
+      name: 替换数据
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: replace into
+      level: low
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "replace into"
+    - id: 44
+      policy_id: OPE.DELETE.001
+      name: 删除部分数据
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: delete from where
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "delete from where"
+    - id: 45
+      policy_id: OPE.DELETE.002
+      name: 删除全表数据
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: delete from
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "delete from"
+    - id: 46
+      policy_id: OPE.UPDATE.001
+      name: 更新部分数据
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: update set where
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "update set where"
+    - id: 47
+      policy_id: OPE.UPDATE.002
+      name: 更新全表数据
+      type: BASIC
+      enable: true
+      rule_id: KeyWord
+      operator: ==
+      value: update set
+      level: high
+      special: false
+      priority: 60
+      description: ""
+      suggestion: ""
+      expr: KeyWord == "update set"
+    - id: 48
+      policy_id: OPE.AFFECTROWS.001
+      name: 影响行数大于等于10w
+      type: BASIC
+      enable: true
+      rule_id: AffectRows
+      operator: '>='
+      value: 100000
+      level: high
+      special: true
+      priority: 70
+      description: ""
+      suggestion: ""
+      expr: AffectRows >= 100000
+    - id: 49
+      policy_id: OPE.AFFECTROWS.002
+      name: 影响行数在2w和10w之间
+      type: BASIC
+      enable: true
+      rule_id: AffectRows
+      operator: between
+      value:
+        - 20000
+        - 100000
+      level: high
+      special: true
+      priority: 70
+      description: ""
+      suggestion: ""
+      expr: 20000 <= AffectRows && AffectRows <= 100000
+    - id: 50
+      policy_id: OPE.AFFECTROWS.003
+      name: 影响行数小于等于2w
+      type: BASIC
+      enable: true
+      rule_id: AffectRows
+      operator: <=
+      value: 20000
+      level: low
+      special: false
+      priority: 50
+      description: ""
+      suggestion: ""
+      expr: AffectRows <= 20000
+    - id: 51
+      policy_id: OPE.AFFECTROWS.004
+      name: 影响行数大于2w
+      type: BASIC
+      enable: true
+      rule_id: AffectRows
+      operator: '>'
+      value: 20000
+      level: high
+      special: true
+      priority: 70
+      description: ""
+      suggestion: ""
+      expr: AffectRows > 20000
+    - id: 52
+      policy_id: RUN.CAPACITY.001
+      name: 表大小大于2G
+      type: BASIC
+      enable: true
+      rule_id: TableSize
+      operator: '>'
+      value: 2048
+      level: high
+      special: false
+      priority: 50
+      description: ""
+      suggestion: ""
+      expr: TableSize > 2048
+    - id: 53
+      policy_id: RUN.CAPACITY.002
+      name: 表大小小于等于2G
+      type: BASIC
+      enable: true
+      rule_id: TableSize
+      operator: <=
+      value: 2048
+      level: low
+      special: false
+      priority: 50
+      description: ""
+      suggestion: ""
+      expr: TableSize <= 2048
+    - id: 54
+      policy_id: RUN.CAPACITY.003
+      name: 表行数小于等于10w
+      type: BASIC
+      enable: true
+      rule_id: TableRows
+      operator: <=
+      value: 100000
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: TableRows <= 100000
+    - id: 55
+      policy_id: RUN.CAPACITY.004
+      name: 表行数大于2w
+      type: BASIC
+      enable: true
+      rule_id: TableRows
+      operator: '>'
+      value: 20000
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: TableRows > 20000
+    - id: 56
+      policy_id: RUN.CAPACITY.005
+      name: 表行数小于等于2w
+      type: BASIC
+      enable: true
+      rule_id: TableRows
+      operator: <=
+      value: 20000
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: TableRows <= 20000
+    - id: 57
+      policy_id: RUN.CAPACITY.006
+      name: 磁盘容量充足
+      type: BASIC
+      enable: true
+      rule_id: DiskSufficient
+      operator: ==
+      value: true
+      level: low
+      special: false
+      priority: 10
+      description: 磁盘可用空间大于表大小，磁盘容量充足可以进行DDL操作
+      suggestion: ""
+      expr: DiskSufficient == true
+    - id: 58
+      policy_id: RUN.CAPACITY.007
+      name: 磁盘容量不充足
+      type: BASIC
+      enable: true
+      rule_id: DiskSufficient
+      operator: ==
+      value: false
+      level: low
+      special: false
+      priority: 10
+      description: 磁盘可用空间小于表大小，此时磁盘容量不足以支持DDL操作
+      suggestion: ""
+      expr: DiskSufficient == false
+    - id: 59
+      policy_id: RUN.TABINFO.001
+      name: 表存在主键
+      type: BASIC
+      enable: true
+      rule_id: PrimaryKeyExist
+      operator: ==
+      value: true
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: PrimaryKeyExist == true
+    - id: 60
+      policy_id: RUN.TABINFO.002
+      name: 表不存在主键
+      type: BASIC
+      enable: true
+      rule_id: PrimaryKeyExist
+      operator: ==
+      value: false
+      level: fatal
+      special: false
+      priority: 999
+      description: ""
+      suggestion: ""
+      expr: PrimaryKeyExist == false
+    - id: 61
+      policy_id: RUN.TABINFO.003
+      name: 表存在外键
+      type: BASIC
+      enable: true
+      rule_id: ForeignKeyExist
+      operator: ==
+      value: true
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: ForeignKeyExist == true
+    - id: 62
+      policy_id: RUN.TABINFO.004
+      name: 表不存在外键
+      type: BASIC
+      enable: true
+      rule_id: ForeignKeyExist
+      operator: ==
+      value: false
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: ForeignKeyExist == false
+    - id: 63
+      policy_id: RUN.TABINFO.005
+      name: 表存在触发器
+      type: BASIC
+      enable: true
+      rule_id: TriggerExist
+      operator: ==
+      value: true
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: TriggerExist == true
+    - id: 64
+      policy_id: RUN.TABINFO.006
+      name: 表不存在触发器
+      type: BASIC
+      enable: true
+      rule_id: TriggerExist
+      operator: ==
+      value: false
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: TriggerExist == false
+    - id: 65
+      policy_id: RUN.TABINFO.007
+      name: where条件中存在索引列
+      type: BASIC
+      enable: true
+      rule_id: IndexExistInWhere
+      operator: ==
+      value: true
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: IndexExistInWhere == true
+    - id: 66
+      policy_id: RUN.TABINFO.008
+      name: where条件中不存在索引列
+      type: BASIC
+      enable: true
+      rule_id: IndexExistInWhere
+      operator: ==
+      value: false
+      level: low
+      special: false
+      priority: 10
+      description: ""
+      suggestion: ""
+      expr: IndexExistInWhere == false
+    - id: 67
+      policy_id: AGG.RULEPRIORITY.001
+      name: 优先级最高的基本策略
+      type: AGG
+      enable: true
+      rule_id: RulePriority
+      operator: highest
+      value:
+        - '*'
+      level: low
+      special: true
+      priority: 150
+      description: ""
+      suggestion: ""
+      expr: RULEPRIORITYHIGHEST(matchedBasicPolicies, "*")
+    - id: 68
+      policy_id: AGG.RULEPRIORITY.002
+      name: 优先级最低的基本策略
+      type: AGG
+      enable: false
+      rule_id: RulePriority
+      operator: lowest
+      value:
+        - '*'
+      level: low
+      special: false
+      priority: 140
+      description: ""
+      suggestion: ""
+      expr: RULEPRIORITYLOWEST(matchedBasicPolicies, "*")
+    - id: 69
+      policy_id: AGG.RULELEVEL.001
+      name: 风险等级最高的基本策略
+      type: AGG
+      enable: false
+      rule_id: RulePriority
+      operator: highest
+      value:
+        - '*'
+      level: low
+      special: false
+      priority: 130
+      description: ""
+      suggestion: ""
+      expr: RULEPRIORITYHIGHEST(matchedBasicPolicies, "*")
+    - id: 70
+      policy_id: AGG.RULELEVEL.002
+      name: 风险等级最低的基本策略
+      type: AGG
+      enable: false
+      rule_id: RulePriority
+      operator: lowest
+      value:
+        - '*'
+      level: low
+      special: false
+      priority: 120
+      description: ""
+      suggestion: ""
+      expr: RULEPRIORITYLOWEST(matchedBasicPolicies, "*")
+    - id: 71
+      policy_id: AGG.RULEMATCH.001
+      name: 插入数据
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.INSERT.001
+      level: low
+      special: false
+      priority: 150
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.INSERT.001")
+    - id: 72
+      policy_id: AGG.RULEMATCH.002
+      name: 插入查询数据
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.INSERT.002
+      level: high
+      special: false
+      priority: 210
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.INSERT.002")
+    - id: 73
+      policy_id: AGG.RULEMATCH.051
+      name: ALTER动作类型&&表大小小于等于2G
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.ALTER.000
+        - RUN.CAPACITY.002
+      level: low
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.ALTER.000","RUN.CAPACITY.002")
+    - id: 74
+      policy_id: AGG.RULEMATCH.052
+      name: ALTER动作类型&&表大小大于2G
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.ALTER.000
+        - RUN.CAPACITY.001
+      level: high
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.ALTER.000","RUN.CAPACITY.001")
+    - id: 75
+      policy_id: AGG.RULEMATCH.053
+      name: ALTER动作类型&&磁盘容量不充足
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.ALTER.000
+        - RUN.CAPACITY.007
+      level: fatal
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.ALTER.000","RUN.CAPACITY.007")
+    - id: 76
+      policy_id: AGG.RULEMATCH.054
+      name: 添加主键
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.ALTER.007
+      level: high
+      special: false
+      priority: 210
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.ALTER.007")
+    - id: 77
+      policy_id: AGG.RULEMATCH.055
+      name: 删除主键
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.ALTER.008
+      level: fatal
+      special: false
+      priority: 210
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.ALTER.008")
+    - id: 78
+      policy_id: AGG.RULEMATCH.101
+      name: 删除全表数据&&影响行数大于等于10w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.DELETE.002
+        - OPE.AFFECTROWS.001
+      level: high
+      special: true
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.DELETE.002","OPE.AFFECTROWS.001")
+    - id: 79
+      policy_id: AGG.RULEMATCH.102
+      name: 删除全表数据&&影响行数在2w和10w之间
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.DELETE.002
+        - OPE.AFFECTROWS.002
+      level: low
+      special: true
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.DELETE.002","OPE.AFFECTROWS.002")
+    - id: 80
+      policy_id: AGG.RULEMATCH.103
+      name: 删除全表数据&&影响行数小于等于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.DELETE.002
+        - OPE.AFFECTROWS.003
+      level: low
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.DELETE.002","OPE.AFFECTROWS.003")
+    - id: 81
+      policy_id: AGG.RULEMATCH.104
+      name: 删除部分数据&&表行数小于等于10w&&影响行数大于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.DELETE.001
+        - RUN.CAPACITY.003
+        - OPE.AFFECTROWS.004
+      level: low
+      special: true
+      priority: 210
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.DELETE.001","RUN.CAPACITY.003","OPE.AFFECTROWS.004")
+    - id: 82
+      policy_id: AGG.RULEMATCH.105
+      name: 删除部分数据&&表行数小于等于10w&&影响行数小于等于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.DELETE.001
+        - RUN.CAPACITY.003
+        - OPE.AFFECTROWS.003
+      level: low
+      special: false
+      priority: 210
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.DELETE.001","RUN.CAPACITY.003","OPE.AFFECTROWS.003")
+    - id: 83
+      policy_id: AGG.RULEMATCH.106
+      name: 删除部分数据&&where条件中不存在索引列&&影响行数大于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.DELETE.001
+        - RUN.TABINFO.008
+        - OPE.AFFECTROWS.004
+      level: high
+      special: true
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.DELETE.001","RUN.TABINFO.008","OPE.AFFECTROWS.004")
+    - id: 84
+      policy_id: AGG.RULEMATCH.107
+      name: 删除部分数据&&where条件中不存在索引列&&影响行数小于等于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.DELETE.001
+        - RUN.TABINFO.008
+        - OPE.AFFECTROWS.003
+      level: high
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.DELETE.001","RUN.TABINFO.008","OPE.AFFECTROWS.003")
+    - id: 85
+      policy_id: AGG.RULEMATCH.108
+      name: 删除部分数据&&where条件中存在索引列&&影响行数大于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.DELETE.001
+        - RUN.TABINFO.007
+        - OPE.AFFECTROWS.004
+      level: low
+      special: true
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.DELETE.001","RUN.TABINFO.007","OPE.AFFECTROWS.004")
+    - id: 86
+      policy_id: AGG.RULEMATCH.109
+      name: 删除部分数据&&where条件中存在索引列&&影响行数小于等于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.DELETE.001
+        - RUN.TABINFO.007
+        - OPE.AFFECTROWS.003
+      level: low
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.DELETE.001","RUN.TABINFO.007","OPE.AFFECTROWS.003")
+    - id: 87
+      policy_id: AGG.RULEMATCH.151
+      name: 更新全表数据&&影响行数大于等于10w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.UPDATE.002
+        - OPE.AFFECTROWS.001
+      level: high
+      special: true
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.UPDATE.002","OPE.AFFECTROWS.001")
+    - id: 88
+      policy_id: AGG.RULEMATCH.152
+      name: 更新全表数据&&影响行数在2w和10w之间
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.UPDATE.002
+        - OPE.AFFECTROWS.002
+      level: low
+      special: true
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.UPDATE.002","OPE.AFFECTROWS.002")
+    - id: 89
+      policy_id: AGG.RULEMATCH.153
+      name: 更新全表数据&&影响行数小于等于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.UPDATE.002
+        - OPE.AFFECTROWS.003
+      level: low
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.UPDATE.002","OPE.AFFECTROWS.003")
+    - id: 90
+      policy_id: AGG.RULEMATCH.154
+      name: 更新部分数据&&表行数小于等于10w&&影响行数大于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.UPDATE.001
+        - RUN.CAPACITY.003
+        - OPE.AFFECTROWS.004
+      level: low
+      special: true
+      priority: 210
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.UPDATE.001","RUN.CAPACITY.003","OPE.AFFECTROWS.004")
+    - id: 91
+      policy_id: AGG.RULEMATCH.155
+      name: 更新部分数据&&表行数小于等于10w&&影响行数小于等于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.UPDATE.001
+        - RUN.CAPACITY.003
+        - OPE.AFFECTROWS.003
+      level: low
+      special: false
+      priority: 210
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.UPDATE.001","RUN.CAPACITY.003","OPE.AFFECTROWS.003")
+    - id: 92
+      policy_id: AGG.RULEMATCH.156
+      name: 更新部分数据&&where条件中不存在索引列&&影响行数大于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.UPDATE.001
+        - RUN.TABINFO.008
+        - OPE.AFFECTROWS.004
+      level: high
+      special: true
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.UPDATE.001","RUN.TABINFO.008","OPE.AFFECTROWS.004")
+    - id: 93
+      policy_id: AGG.RULEMATCH.157
+      name: 更新部分数据&&where条件中不存在索引列&&影响行数小于等于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.UPDATE.001
+        - RUN.TABINFO.008
+        - OPE.AFFECTROWS.003
+      level: high
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.UPDATE.001","RUN.TABINFO.008","OPE.AFFECTROWS.003")
+    - id: 94
+      policy_id: AGG.RULEMATCH.158
+      name: 更新部分数据&&where条件中存在索引列&&影响行数大于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.UPDATE.001
+        - RUN.TABINFO.007
+        - OPE.AFFECTROWS.004
+      level: high
+      special: true
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.UPDATE.001","RUN.TABINFO.007","OPE.AFFECTROWS.004")
+    - id: 95
+      policy_id: AGG.RULEMATCH.159
+      name: 更新部分数据&&where条件中存在索引列&&影响行数小于等于2w
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.UPDATE.001
+        - RUN.TABINFO.007
+        - OPE.AFFECTROWS.003
+      level: low
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.UPDATE.001","RUN.TABINFO.007","OPE.AFFECTROWS.003")
+    - id: 96
+      policy_id: AGG.RULEMATCH.201
+      name: 创建表&&表存在主键
+      type: AGG
+      enable: true
+      rule_id: RuleMatch
+      operator: all
+      value:
+        - OPE.CREATE.001
+        - RUN.TABINFO.001
+      level: low
+      special: false
+      priority: 200
+      description: ""
+      suggestion: ""
+      expr: ALL(matchedBasicPolicies, "OPE.CREATE.001","RUN.TABINFO.001")

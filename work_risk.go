@@ -30,7 +30,8 @@ type WorkRisk struct {
 	DataBase      string          `gorm:"type:varchar(1024);not null;column:data_base;comment:数据库名称" json:"database"`
 	Table         string          `gorm:"type:varchar(1024);column:addr;comment:表名" json:"table"`
 	SQLText       string          `gorm:"type:longtext;column:sql_text;comment:SQL" json:"sql_text"`
-	SQLRisks      []SQLRisk       `gorm:"-;comment:各个SQL风险" json:"sql_risks"`
+	SQLRisks      []*SQLRisk      `gorm:"-;comment:各个SQL风险" json:"sql_risks"`
+	Summary       Summary         `gorm:"type:json;column:summary;comment:工单概要信息" json:"summary"`
 	InfoPolicy    []policy.Policy `gorm:"type:json;column:info_policy;comment:最终生效的info级别的策略" json:"info_policy"`
 	LowPolicy     []policy.Policy `gorm:"type:json;column:low_policy;comment:最终生效的low级别的策略" json:"low_policy"`
 	HighPolicy    []policy.Policy `gorm:"type:json;column:high_policy;comment:最终生效的high级别的策略" json:"high_policy"`
@@ -40,11 +41,23 @@ type WorkRisk struct {
 	Errors        []ErrorResult   `gorm:"type:json;column:errors;comment:错误信息" json:"errors"`
 	Config        *Config         `gorm:"type:json;column:config;comment:相关配置信息" json:"config"`
 	Cost          int             `gorm:"type:int;column:cost;comment:识别工单风险花费时间" json:"cost"`
+	cache         map[string]any
 }
 
 type Config struct {
 	Runtime    Client     `json:"runtime"`
 	RiskConfig RiskConfig `json:"risk_config"`
+}
+
+type Summary struct {
+	DataBaseNum int `json:"data_base_num"`
+	TableNum    int `json:"table_num"`
+	SQLCount    int `json:"sql_count"`
+	ErrorCount  int `json:"error_count"`
+	FatalCount  int `json:"fatal_count"`
+	HighCount   int `json:"high_count"`
+	LowCount    int `json:"low_count"`
+	InfoCount   int `json:"info_count"`
 }
 
 func NewWorkRisk(workID, addr, rwAddr, port, user, passwd, database, sql string, config *Config) *WorkRisk {
@@ -61,6 +74,7 @@ func NewWorkRisk(workID, addr, rwAddr, port, user, passwd, database, sql string,
 		DataBase:      database,
 		SQLText:       sql,
 		Config:        config,
+		cache:         make(map[string]any, 1),
 	}
 }
 
@@ -80,6 +94,7 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 	start := time.Now()
 	defer func() {
 		c.Cost = int(time.Now().Sub(start).Milliseconds())
+		c.CalculateSummary()
 	}()
 
 	// 对工单中的sql语句进行拆分
@@ -107,6 +122,9 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 		}
 	}
 
+	// 统计信息
+	c.CalculateSummary()
+
 	// 校验是否对库进行越权操作
 	err = c.ExceedingPermissions()
 	if err != nil {
@@ -114,6 +132,10 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 		c.SetItemError(Authority, err)
 		return err
 	}
+
+	// 抽样检测
+	// insert：按SQL指纹进行采样检测
+	c.SampDetectForInsert()
 
 	matchedPolicies := make([]policy.Policy, 0, len(c.SQLRisks))
 	// 遍历SQL进行前置风险识别
@@ -166,7 +188,7 @@ func (c *WorkRisk) SplitStatement() error {
 
 	sqlList := comm.SplitStatement(c.SQLText)
 	for _, sql := range sqlList {
-		sqlRisk := SQLRisk{
+		sqlRisk := &SQLRisk{
 			WorkID:        c.WorkID,
 			Addr:          c.Addr,
 			ReadWriteAddr: c.ReadWriteAddr,
@@ -177,6 +199,7 @@ func (c *WorkRisk) SplitStatement() error {
 			SQLText:       sql,
 			Errors:        nil,
 			Config:        c.Config,
+			cache:         c.cache,
 		}
 		c.SQLRisks = append(c.SQLRisks, sqlRisk)
 	}
@@ -239,4 +262,54 @@ func (c *WorkRisk) String() string {
 		return err.Error()
 	}
 	return buf.String()
+}
+
+// SampDetectForInsert 采样检测insert语句
+func (c *WorkRisk) SampDetectForInsert() *WorkRisk {
+	m := make(map[string]struct{}, len(c.SQLRisks))
+	deleteItem := make([]int, 0, len(c.SQLRisks))
+	for i, r := range c.SQLRisks {
+		if _, ok := m[r.FingerID]; !ok && r.JudgeItemValue(policy.KeyWord.ID, policy.KeyWord.V.Insert) {
+			m[r.FingerID] = struct{}{}
+		} else {
+			deleteItem = append(deleteItem, i)
+		}
+	}
+
+	for i := len(deleteItem) - 1; i >= 0; i-- {
+		index := deleteItem[i]
+		c.SQLRisks = append(c.SQLRisks[:index], c.SQLRisks[index+1:]...)
+	}
+	return c
+}
+
+func (c *WorkRisk) CalculateSummary() *WorkRisk {
+	if c.Summary.DataBaseNum == 0 || c.Summary.TableNum == 0 || c.Summary.SQLCount == 0 {
+		database := make(map[string]struct{}, len(c.SQLRisks))
+		table := make(map[string]struct{}, len(c.SQLRisks))
+		for _, r := range c.SQLRisks {
+			for _, tab := range r.Tables {
+				d, _ := comm.SplitDataBaseAndTable(tab)
+				database[d] = struct{}{}
+				table[tab] = struct{}{}
+			}
+			c.Summary.SQLCount++
+		}
+		c.Summary.DataBaseNum = len(database)
+		c.Summary.TableNum = len(table)
+		return c
+	}
+
+	c.Summary.ErrorCount = len(c.Errors)
+	c.Summary.FatalCount = 0
+	c.Summary.HighCount = 0
+	c.Summary.LowCount = 0
+	c.Summary.InfoCount = 0
+	for _, r := range c.SQLRisks {
+		c.Summary.FatalCount += len(r.FatalPolicy)
+		c.Summary.HighCount += len(r.HighPolicy)
+		c.Summary.LowCount += len(r.LowPolicy)
+		c.Summary.InfoCount += len(r.InfoPolicy)
+	}
+	return c
 }
