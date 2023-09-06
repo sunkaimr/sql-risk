@@ -100,7 +100,7 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 	// 对工单中的sql语句进行拆分
 	err := c.SplitStatement()
 	if err != nil {
-		err = fmt.Errorf("split statement failed, %s", err)
+		err = fmt.Errorf("split SQL statement failed, %s", err)
 		c.SetPreResult(comm.Fatal, false)
 		c.SetItemError(ParseSQL, err)
 		return err
@@ -142,7 +142,7 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 	for i, _ := range c.SQLRisks {
 		err = c.SQLRisks[i].IdentifyPreRisk()
 		if err != nil {
-			err = fmt.Errorf("identify sql risk failed, %s", err)
+			err = fmt.Errorf("identify SQL risk failed, %s", err)
 			c.SetPreResult(comm.Fatal, false)
 			c.SetItemError(IdentifyRisk, err)
 			return err
@@ -306,11 +306,12 @@ func (c *WorkRisk) CalculateSummary() *WorkRisk {
 	}
 
 	c.Summary.ErrorCount = len(c.Errors)
+	c.Summary.InfoCount = len(c.InfoPolicy)
 	c.Summary.FatalCount = 0
 	c.Summary.HighCount = 0
 	c.Summary.LowCount = 0
-	c.Summary.InfoCount = 0
 	for _, r := range c.SQLRisks {
+		c.Summary.ErrorCount += len(r.Errors)
 		c.Summary.FatalCount += len(r.FatalPolicy)
 		c.Summary.HighCount += len(r.HighPolicy)
 		c.Summary.LowCount += len(r.LowPolicy)
