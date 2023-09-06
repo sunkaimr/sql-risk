@@ -183,8 +183,11 @@ func (c *WorkRisk) SplitStatement() error {
 	idx := strings.Index(c.SQLText, " ")
 	if idx != -1 {
 		c.SQLText = regexp.MustCompile(` `).ReplaceAllString(c.SQLText, " ")
-		//c.SetItemError(ParseSQL, fmt.Errorf("column %d near found chinese encoded characters", idx))
-		c.SetMatchPolicies(policy.NewCustomPolicy(ParseSQL, "", fmt.Sprintf("列%d附近发现中文空格", idx), "中文空格可能引发兼容性问题，建议避免使用中文空格", comm.Info))
+		firstWord := comm.GetNextWord(c.SQLText, idx)
+		c.SetMatchPolicies(policy.NewCustomPolicy(ParseSQL, "",
+			fmt.Sprintf("第%d列 \"%s\"附近发现中文空格", idx, firstWord),
+			"中文空格可能引发兼容性问题，建议避免使用中文空格",
+			comm.Info))
 	}
 
 	sqlList := comm.SplitStatement(c.SQLText)

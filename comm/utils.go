@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"regexp"
 	"strings"
 )
 
@@ -245,4 +246,18 @@ func Hash(str string) string {
 	id := md5.New()
 	io.WriteString(id, str)
 	return fmt.Sprintf("%x", id.Sum(nil))
+}
+
+// GetNextWord 用正则表达式找到下一个完整的单词
+func GetNextWord(sentence string, startIndex int) string {
+	if startIndex >= len(sentence) || startIndex < 0 {
+		return ""
+	}
+	// 用正则表达式找到下一个完整的单词
+	regex := regexp.MustCompile(`\b\w+\b`)
+	matches := regex.FindAllString(sentence[startIndex:], 1)
+	if len(matches) > 0 {
+		return matches[0]
+	}
+	return ""
 }
