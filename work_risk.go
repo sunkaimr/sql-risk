@@ -116,8 +116,8 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 	for i, _ := range c.SQLRisks {
 		err = c.SQLRisks[i].SetSQLBasicInfo()
 		if err != nil {
-			c.SetPreResult(comm.Fatal, false)
-			c.SetItemError(ParseSQL, err)
+			c.SQLRisks[i].SetPreResult(comm.Fatal, false)
+			c.SQLRisks[i].SetItemError(ParseSQL, err)
 			return err
 		}
 	}
@@ -143,8 +143,8 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 		err = c.SQLRisks[i].IdentifyPreRisk()
 		if err != nil {
 			err = fmt.Errorf("identify SQL risk failed, %s", err)
-			c.SetPreResult(comm.Fatal, false)
-			c.SetItemError(IdentifyRisk, err)
+			c.SQLRisks[i].SetPreResult(comm.Fatal, false)
+			c.SQLRisks[i].SetItemError(IdentifyRisk, err)
 			return err
 		}
 
@@ -302,7 +302,6 @@ func (c *WorkRisk) CalculateSummary() *WorkRisk {
 		}
 		c.Summary.DataBaseNum = len(database)
 		c.Summary.TableNum = len(table)
-		return c
 	}
 
 	c.Summary.ErrorCount = len(c.Errors)
