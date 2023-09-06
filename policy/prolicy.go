@@ -1742,12 +1742,12 @@ func RuleLevelLOW(matchBasic []string, value ...string) bool {
 
 func generateDefaultBasicPolicy() map[string]any {
 	mm := make(map[string]any, 20)
-	mm[Operate.ID] = string(Operate.V.DML)
-	mm[Action.ID] = string(Action.V.Select)
-	mm[KeyWord.ID] = string(KeyWord.V.Select)
+	mm[Operate.ID] = string(Operate.V.Unknown)
+	mm[Action.ID] = string(Action.V.Unknown)
+	mm[KeyWord.ID] = string(KeyWord.V.Unknown)
 	mm[TabExist.ID] = true
-	mm[TabSize.ID] = 100
-	mm[TabRows.ID] = 100
+	mm[TabSize.ID] = 0
+	mm[TabRows.ID] = 0
 	mm[AffectRows.ID] = 100
 	mm[FreeDisk.ID] = 102400
 	mm[DiskSufficient.ID] = true
@@ -1755,7 +1755,7 @@ func generateDefaultBasicPolicy() map[string]any {
 	mm[ForeignKeyExist.ID] = false
 	mm[TriggerExist.ID] = false
 	mm[IndexExistInWhere.ID] = true
-	mm[CpuUsage.ID] = 10
+	mm[CpuUsage.ID] = 0
 	mm[BigTransaction.ID] = false
 	return mm
 }
@@ -2025,4 +2025,14 @@ func fetchPolicyID(policies []Policy) []string {
 		s = append(s, policy.PolicyID)
 	}
 	return s
+}
+
+func NewCustomPolicy(name, ruleID, desc, suggestion string, level comm.Level) Policy {
+	return Policy{
+		Name:        name,
+		RuleID:      ruleID,
+		Level:       level,
+		Description: desc,
+		Suggestion:  suggestion,
+	}
 }
