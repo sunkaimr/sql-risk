@@ -1094,6 +1094,12 @@ func (c *SQLRisk) SetItemValue(name, id string, v any, cost int) {
 
 // SetItemError 记录错误信息
 func (c *SQLRisk) SetItemError(name string, e error) {
+	for i, _ := range c.Errors {
+		if c.Errors[i].Type == name && c.Errors[i].Error == e.Error() {
+			return
+		}
+	}
+
 	c.Errors = append(c.Errors, ErrorResult{Type: name, Error: e.Error()})
 }
 
