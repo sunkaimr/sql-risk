@@ -14,7 +14,6 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"regexp"
 	"strings"
 )
 
@@ -248,16 +247,35 @@ func Hash(str string) string {
 	return fmt.Sprintf("%x", id.Sum(nil))
 }
 
-// GetNextWord 用正则表达式找到下一个完整的单词
-func GetNextWord(sentence string, startIndex int) string {
-	if startIndex >= len(sentence) || startIndex < 0 {
+// GetSurroundingWords 给定一个字符串的下标返回字符串的前后的单词
+func GetSurroundingWords(words string, idx int) string {
+	if idx >= len(words) || idx < 0 {
 		return ""
 	}
-	// 用正则表达式找到下一个完整的单词
-	regex := regexp.MustCompile(`\b\w+\b`)
-	matches := regex.FindAllString(sentence[startIndex:], 1)
-	if len(matches) > 0 {
-		return matches[0]
+
+	// 前往前搜索
+	prevWordIdx := idx
+	if prevWordIdx > 0 {
+		prevWordIdx = idx - 1
+		for i := prevWordIdx; i >= 0; i-- {
+			if words[i] == ' ' {
+				prevWordIdx = i
+				break
+			}
+		}
 	}
-	return ""
+
+	// 前往后搜索
+	nextWordIdx := idx
+	if nextWordIdx < len(words) {
+		nextWordIdx = idx + 1
+		for i := nextWordIdx; i < len(words); i++ {
+			if words[i] == ' ' {
+				nextWordIdx = i
+				break
+			}
+		}
+	}
+
+	return words[prevWordIdx:nextWordIdx]
 }
