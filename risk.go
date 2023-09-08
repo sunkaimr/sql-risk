@@ -282,7 +282,8 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 		return err
 	}
 
-	if keyword == policy.KeyWord.V.CreateTab || keyword == policy.KeyWord.V.CreateTabAs || keyword == policy.KeyWord.V.CreateTmpTab {
+	if keyword == policy.KeyWord.V.CreateTab || keyword == policy.KeyWord.V.CreateTabAs ||
+		keyword == policy.KeyWord.V.CreateTmpTab || keyword == policy.KeyWord.V.DropTabIfExist {
 		c.SetItemValue(policy.TabExist.Name, policy.TabExist.ID, false, 0)
 	} else {
 		err = c.CollectValueWithCache(policy.TabExist.Name, policy.TabExist.ID, nil, "CollectTableExist", true)
@@ -359,6 +360,10 @@ func (c *SQLRisk) CollectAction() (policy.OperateType, policy.ActionType, policy
 			return policy.Operate.V.DDL, policy.Action.V.Drop, policy.KeyWord.V.DropView, nil
 		}
 		// 删除表：DROP TABLE IF EXISTS mytable;
+		if st.IfExists {
+			return policy.Operate.V.DDL, policy.Action.V.Drop, policy.KeyWord.V.DropTabIfExist, nil
+		}
+		// 删除表：DROP TABLE mytable;
 		return policy.Operate.V.DDL, policy.Action.V.Drop, policy.KeyWord.V.DropTab, nil
 	case *ast.DropDatabaseStmt:
 		// 删除数据库：DROP DATABASE IF EXISTS mydatabase;
@@ -799,7 +804,6 @@ func (c *SQLRisk) CollectTranRelated() (bool, error) {
 func (c *SQLRisk) CollectPrimaryKeyExist() (bool, error) {
 	var err error
 
-	// 获取表行数
 	tabExist, err := c.GetItemValueWithBool(policy.TabExist.ID)
 	if err != nil {
 		err = c.CollectValueWithCache(policy.TabExist.Name, policy.TabExist.ID, nil, "CollectTableExist", true)

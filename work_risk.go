@@ -97,6 +97,14 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 		c.CalculateSummary()
 	}()
 
+	// 校验库是否为空
+	if c.DataBase == "" {
+		err := fmt.Errorf("database is null")
+		c.SetPreResult(comm.Fatal, false)
+		c.SetItemError(ParseSQL, err)
+		return err
+	}
+
 	// 对工单中的sql语句进行拆分
 	err := c.SplitStatement()
 	if err != nil {
@@ -145,6 +153,7 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 			err = fmt.Errorf("identify SQL risk failed, %s", err)
 			c.SQLRisks[i].SetPreResult(comm.Fatal, false)
 			c.SQLRisks[i].SetItemError(IdentifyRisk, err)
+			c.SetPreResult(comm.Fatal, false)
 			return err
 		}
 
@@ -223,7 +232,7 @@ func (c *WorkRisk) ExceedingPermissions() error {
 		}
 
 		if !comm.EleExist(sqlRisk.DataBase, database) {
-			return fmt.Errorf("check exceeding permissions not pass, database(%s) not in %v", sqlRisk.DataBase, database)
+			return fmt.Errorf("check exceeding permissions not pass, database(%v) must contain (%v)", database, sqlRisk.DataBase)
 		}
 	}
 

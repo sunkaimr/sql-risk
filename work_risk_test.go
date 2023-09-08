@@ -72,9 +72,9 @@ func TestIdentifyWorkRiskPreRisk(t *testing.T) {
 	addr := "10.2.66.8"
 	port := "3306"
 	database := "isql_test"
-	sql := "CREATE TABLE `execute_activety` (\n  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',\n  `name` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '步骤名称',\n  `code` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '步骤编码',\n  `system_type` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '系统类型',\n  `type` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '步骤类型',\n  `param` varchar(512) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '参数',\n  `remark` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '备注',\n  `guide_url` varchar(1024) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '指引文档',\n  `process_id` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Camund流程ID',\n  `status` varchar(4) COLLATE utf8mb4_bin DEFAULT '0' COMMENT '状态',\n  `gmt_create` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n  `gmt_update` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',\n  `create_by` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '创建人',\n  `update_by` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '更新人',\n  `version` int(11) DEFAULT '0' COMMENT '版本号',\n  `extend` varchar(2048) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '扩展',\n  `camunda_url` varchar(200) COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'camunda地址',\n  `apollo_app_id` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '阿波罗KEYappId',\n  `form_page` varchar(100) COLLATE utf8mb4_bin DEFAULT 'apollo_config_common_form' COMMENT '配置页面地址',\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;\n"
-	user := "yearning_dml"
-	passwd := "yearning_dml"
+	sql := "DROP TABLE IF EXISTS `area_out_in_stock_process`;"
+	user := "root"
+	passwd := "123456"
 	j := json.Config{EscapeHTML: false, IndentionStep: 2}.Froze()
 
 	w := NewWorkRisk("111", addr, "", port, user, passwd, database, sql, nil)

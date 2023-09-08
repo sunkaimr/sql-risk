@@ -118,6 +118,7 @@ type KeyWordValues struct {
 	Unknown         KeyWordType
 	Select          KeyWordType
 	DropTab         KeyWordType
+	DropTabIfExist  KeyWordType
 	DropDB          KeyWordType
 	DropIdx         KeyWordType
 	DropProcedure   KeyWordType
@@ -165,6 +166,7 @@ var KeyWord = KeyWordStruct{
 		Unknown:         "unknown",
 		Select:          "select",
 		DropTab:         "drop table",
+		DropTabIfExist:  "drop table if exist",
 		DropDB:          "drop database",
 		DropIdx:         "drop index",
 		DropProcedure:   "drop procedure",
