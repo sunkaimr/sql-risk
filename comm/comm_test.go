@@ -62,6 +62,11 @@ func TestParseRelatedTableName(t *testing.T) {
 			DataBase: "d1",
 			SQLText:  "INSERT INTO d2.t2 (column1, column2, column3) SELECT column1, column2, column3 FROM d1.t1 b WHERE b.id=1;",
 		},
+		{
+			name: "test005", want: []string{"d1.t1", "d1.t3"},
+			DataBase: "d1",
+			SQLText:  "RENAME TABLE t1 TO t2, t3 TO t4",
+		},
 	}
 
 	for _, test := range tests {

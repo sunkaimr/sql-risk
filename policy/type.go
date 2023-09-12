@@ -87,6 +87,7 @@ type ActionValues struct {
 	Replace  ActionType
 	Delete   ActionType
 	Update   ActionType
+	Rename   ActionType
 }
 
 var Action = ActionStruct{
@@ -105,6 +106,7 @@ var Action = ActionStruct{
 		Replace:  "replace",
 		Delete:   "delete",
 		Update:   "update",
+		Rename:   "rename",
 	},
 }
 
@@ -154,6 +156,7 @@ type KeyWordValues struct {
 	Delete          KeyWordType
 	UpdateWhere     KeyWordType
 	Update          KeyWordType
+	RenameTable     KeyWordType
 }
 
 var KeyWord = KeyWordStruct{
@@ -202,7 +205,13 @@ var KeyWord = KeyWordStruct{
 		Delete:          "delete from",
 		UpdateWhere:     "update set where",
 		Update:          "update set",
+		RenameTable:     "rename table",
 	},
+}
+
+var SQLNum = Item{
+	Name: "SQL数量",
+	ID:   "SQLNum",
 }
 
 var TabExist = Item{

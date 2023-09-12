@@ -474,6 +474,8 @@ func (c *SQLRisk) CollectAction() (policy.OperateType, policy.ActionType, policy
 		}
 		// 全表更新：UPDATE my_table SET col1 = v1;
 		return policy.Operate.V.DML, policy.Action.V.Update, policy.KeyWord.V.Update, nil
+	case *ast.RenameTableStmt:
+		return policy.Operate.V.DDL, policy.Action.V.Rename, policy.KeyWord.V.RenameTable, nil
 	}
 	return policy.Operate.V.Unknown, policy.Action.V.Unknown, policy.KeyWord.V.Unknown, nil
 }

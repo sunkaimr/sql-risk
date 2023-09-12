@@ -72,7 +72,7 @@ func TestIdentifyWorkRiskPreRisk(t *testing.T) {
 	addr := "10.2.66.8"
 	port := "3306"
 	database := "isql_test"
-	sql := "DROP TABLE IF EXISTS `area_out_in_stock_process`;"
+	sql := "RENAME TABLE alter_table TO alter_table111"
 	user := "root"
 	passwd := "123456"
 	j := json.Config{EscapeHTML: false, IndentionStep: 2}.Froze()

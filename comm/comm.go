@@ -219,6 +219,14 @@ func ExtractingRelatedTableName(sql string, defaultDB string) ([]string, error) 
 	jsonString := string(b)
 
 	switch n := node.(type) {
+	case *ast.RenameTableStmt:
+		for _, v := range n.TableToTables {
+			db := v.OldTable.Schema.O
+			if db == "" {
+				db = defaultDB
+			}
+			tables = append(tables, fmt.Sprintf("%s.%s", db, v.OldTable.Name.O))
+		}
 	case *ast.UseStmt:
 		tables = append(tables, fmt.Sprintf("%s.", n.DBName))
 	// SetOprStmt represents "union/except/intersect statement"
