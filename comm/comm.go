@@ -37,14 +37,14 @@ type TableConstraints struct {
 
 // SplitStatement 将多个SQL语句进行拆分
 func SplitStatement(sqls string) []string {
-	sqlList := make([]string, 0, 1)
+	sqlList := make([]string, 0, 100)
 	for {
 		if sqls == "" {
 			break
 		}
 
 		// 查询请求切分
-		orgSQL, sql, bufBytes := SplitOneStatement([]byte(sqls), []byte(";"))
+		orgSQL, sql, bufBytes := SplitOneStatement([]byte(sqls), []byte{';'})
 		if len(sqls) == len(bufBytes) {
 			// 防止切分死循环，当剩余的内容和原 SQL 相同时直接清空 sqls
 			sqls = ""
