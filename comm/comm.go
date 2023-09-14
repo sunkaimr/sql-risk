@@ -642,8 +642,10 @@ func insert2Select(stmt *sqlparser.Insert) string {
 	// 如果insert包含子查询，只需要explain该子树
 	case *sqlparser.Select, *sqlparser.Union:
 		return sqlparser.String(row)
+	case sqlparser.Values:
+		return fmt.Sprintf("select %d", len(row))
 	}
-	return fmt.Sprintf("select %d", len(stmt.Columns))
+	return fmt.Sprintf("select 1")
 }
 
 // update2Select 将 Update 语句改写成 Select
