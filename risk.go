@@ -282,14 +282,19 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 		return err
 	}
 
-	if keyword == policy.KeyWord.V.CreateTab || keyword == policy.KeyWord.V.CreateTabAs ||
-		keyword == policy.KeyWord.V.CreateTmpTab || keyword == policy.KeyWord.V.DropTabIfExist {
-		c.SetItemValue(policy.TabExist.Name, policy.TabExist.ID, false, 0)
-	} else {
-		err = c.CollectValueWithCache(policy.TabExist.Name, policy.TabExist.ID, nil, "CollectTableExist", true)
-		if err != nil {
-			return err
+	err = c.CollectValueWithCache(policy.TabExist.Name, policy.TabExist.ID, nil, "CollectTableExist", func() bool {
+		//  以下情况不能缓存结果，以防止影响后续的判断
+		if comm.EleExist(keyword, []policy.KeyWordType{
+			policy.KeyWord.V.CreateTab,
+			policy.KeyWord.V.CreateTabAs,
+			policy.KeyWord.V.CreateTmpTab,
+			policy.KeyWord.V.DropTabIfExist}) {
+			return false
 		}
+		return true
+	}())
+	if err != nil {
+		return err
 	}
 
 	err = c.CollectValueWithCache(policy.TabSize.Name, policy.TabSize.ID, nil, "CollectTableSize", true)
@@ -317,7 +322,17 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.PrimaryKeyExist.Name, policy.PrimaryKeyExist.ID, nil, "CollectPrimaryKeyExist", true)
+	err = c.CollectValueWithCache(policy.PrimaryKeyExist.Name, policy.PrimaryKeyExist.ID, nil, "CollectPrimaryKeyExist", func() bool {
+		//  以下情况不能缓存主键的结果，以防止影响后续的判断
+		if comm.EleExist(keyword, []policy.KeyWordType{
+			policy.KeyWord.V.DropTabIfExist,
+			policy.KeyWord.V.DropTab,
+			policy.KeyWord.V.DropDB,
+			policy.KeyWord.V.AlertAddPriKey}) {
+			return false
+		}
+		return true
+	}())
 	if err != nil {
 		return err
 	}
@@ -575,6 +590,19 @@ func (c *SQLRisk) CollectAffectRows() (int, error) {
 
 // CollectTableExist 判断表是否存在
 func (c *SQLRisk) CollectTableExist() (bool, error) {
+	keyword, err := c.GetItemValueWithKeyWordType(policy.KeyWord.ID)
+	if err != nil {
+		return false, err
+	}
+	// 不需要判断表是否存在的情况
+	if comm.EleExist(keyword, []policy.KeyWordType{
+		policy.KeyWord.V.CreateTab,
+		policy.KeyWord.V.CreateTabAs,
+		policy.KeyWord.V.CreateTmpTab,
+		policy.KeyWord.V.DropTabIfExist}) {
+		return false, nil
+	}
+
 	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
@@ -804,23 +832,21 @@ func (c *SQLRisk) CollectTranRelated() (bool, error) {
 
 // CollectPrimaryKeyExist 是否存在主键
 func (c *SQLRisk) CollectPrimaryKeyExist() (bool, error) {
-	var err error
-
-	tabExist, err := c.GetItemValueWithBool(policy.TabExist.ID)
+	keyword, err := c.GetItemValueWithKeyWordType(policy.KeyWord.ID)
 	if err != nil {
-		err = c.CollectValueWithCache(policy.TabExist.Name, policy.TabExist.ID, nil, "CollectTableExist", true)
-		if err != nil {
-			return false, fmt.Errorf("attempt to collect TabExist for collecting PrimaryKeyExist failed, %s", err)
-		}
-
-		tabExist, err = c.GetItemValueWithBool(policy.TabExist.ID)
-		if err != nil {
-			return false, fmt.Errorf("attempt to query TabExist for collecting PrimaryKeyExist failed, %s", err)
-		}
+		return false, err
+	}
+	// 不需要判断主键的情况
+	if comm.EleExist(keyword, []policy.KeyWordType{
+		policy.KeyWord.V.DropTabIfExist,
+		policy.KeyWord.V.DropTab,
+		policy.KeyWord.V.DropDB,
+		policy.KeyWord.V.AlertAddPriKey}) {
+		return true, nil
 	}
 
-	// 创建表时解析SQL判断是否指定主键
-	if !tabExist {
+	// 需要通过解析SQL判断是否指定主键
+	if comm.EleExist(keyword, []policy.KeyWordType{policy.KeyWord.V.CreateTab, policy.KeyWord.V.CreateTabAs, policy.KeyWord.V.CreateTmpTab}) {
 		constraints, err := comm.ExtractingTableConstraints(c.SQLText)
 		if err != nil {
 			return false, fmt.Errorf("extracting table constraints failed, %s", err)
@@ -834,7 +860,7 @@ func (c *SQLRisk) CollectPrimaryKeyExist() (bool, error) {
 		return false, nil
 	}
 
-	// 表存在时判断连库判断主键
+	// 需要连库判断主键是否存在
 	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
