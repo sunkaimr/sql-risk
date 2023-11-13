@@ -319,6 +319,24 @@ KEY idx_item_code ( item_code, switch_state, version_num ) USING BTREE
 				},
 			},
 		},
+		{
+			name: "test002",
+			SQLText: `
+CREATE TABLE my_table (
+    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    age INT NOT NULL,
+    email VARCHAR(255) NOT NULL   
+) ENGINE=INNODB  COMMENT '测试表';
+`,
+			want: []TableConstraints{
+				{
+					Name:   "",
+					Type:   "PRIMARY KEY",
+					Column: []string{"id"},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {

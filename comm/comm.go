@@ -418,7 +418,6 @@ func ExtractingTableConstraints(sql string) ([]TableConstraints, error) {
 			switch constraint.Tp {
 			case ast.ConstraintPrimaryKey:
 				c.Type = "PRIMARY KEY"
-
 			case ast.ConstraintKey:
 				c.Type = "KEY"
 			case ast.ConstraintIndex:
@@ -442,6 +441,59 @@ func ExtractingTableConstraints(sql string) ([]TableConstraints, error) {
 				c.Column = append(c.Column, key.Column.Name.O)
 			}
 			constraints = append(constraints, c)
+		}
+
+		colOptions := make(map[string][]string, len(n.Cols))
+		for _, col := range n.Cols {
+			for _, o := range col.Options {
+				keyword := ""
+				switch o.Tp {
+				case ast.ColumnOptionPrimaryKey:
+					keyword = "PRIMARY KEY"
+				case ast.ColumnOptionNotNull:
+					keyword = "NOT NULL"
+				case ast.ColumnOptionAutoIncrement:
+					keyword = "AUTO_INCREMENT"
+				case ast.ColumnOptionDefaultValue:
+					keyword = "DEFAULT"
+				case ast.ColumnOptionUniqKey:
+					keyword = "UNIQUE KEY"
+				case ast.ColumnOptionNull:
+					keyword = "NULL"
+				case ast.ColumnOptionOnUpdate:
+					keyword = "ON UPDATE"
+				case ast.ColumnOptionFulltext:
+					// not support
+				case ast.ColumnOptionComment:
+					keyword = "COMMENT"
+				case ast.ColumnOptionGenerated:
+					keyword = "GENERATED ALWAYS AS"
+				case ast.ColumnOptionReference:
+					// not support
+				case ast.ColumnOptionCollate:
+					// not support
+				case ast.ColumnOptionCheck:
+					// not support
+				case ast.ColumnOptionColumnFormat:
+					keyword = "COLUMN_FORMAT"
+				case ast.ColumnOptionStorage:
+					keyword = "STORAGE"
+				case ast.ColumnOptionAutoRandom:
+					// not support
+				}
+
+				if keyword != "" {
+					colOptions[keyword] = append(colOptions[keyword], col.Name.Name.O)
+				}
+			}
+		}
+
+		for k, v := range colOptions {
+			constraints = append(constraints, TableConstraints{
+				Name:   "",
+				Type:   k,
+				Column: v,
+			})
 		}
 	}
 	return constraints, nil
