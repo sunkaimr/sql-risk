@@ -563,7 +563,9 @@ func (c *SQLRisk) CollectAffectRows() (int, error) {
 	if err != nil {
 		return 0, fmt.Errorf("new mysql connect failed, %s", err)
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 
 	var affectRows int64
 	if tabRows <= c.Config.RiskConfig.TabRowsThreshold && tabSize < c.Config.RiskConfig.TabSizeThreshold {
@@ -841,6 +843,8 @@ func (c *SQLRisk) CollectPrimaryKeyExist() (bool, error) {
 		policy.KeyWord.V.DropTabIfExist,
 		policy.KeyWord.V.DropTab,
 		policy.KeyWord.V.DropDB,
+		policy.KeyWord.V.CreateView,
+		policy.KeyWord.V.DropView,
 		policy.KeyWord.V.AlertAddPriKey}) {
 		return true, nil
 	}
@@ -897,6 +901,20 @@ func (c *SQLRisk) CollectPrimaryKeyExist() (bool, error) {
 
 // CollectForeignKeyExist 是否存在外键
 func (c *SQLRisk) CollectForeignKeyExist() (bool, error) {
+	keyword, err := c.GetItemValueWithKeyWordType(policy.KeyWord.ID)
+	if err != nil {
+		return false, err
+	}
+	// 不需要判断外键的情况
+	if comm.EleExist(keyword, []policy.KeyWordType{
+		policy.KeyWord.V.DropTabIfExist,
+		policy.KeyWord.V.DropTab,
+		policy.KeyWord.V.DropDB,
+		policy.KeyWord.V.CreateView,
+		policy.KeyWord.V.DropView}) {
+		return false, nil
+	}
+
 	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
@@ -932,6 +950,20 @@ func (c *SQLRisk) CollectForeignKeyExist() (bool, error) {
 
 // CollectTriggerExist 是否存在触发器
 func (c *SQLRisk) CollectTriggerExist() (bool, error) {
+	keyword, err := c.GetItemValueWithKeyWordType(policy.KeyWord.ID)
+	if err != nil {
+		return false, err
+	}
+	// 不需要判断触发器
+	if comm.EleExist(keyword, []policy.KeyWordType{
+		policy.KeyWord.V.DropTabIfExist,
+		policy.KeyWord.V.DropTab,
+		policy.KeyWord.V.DropDB,
+		policy.KeyWord.V.CreateView,
+		policy.KeyWord.V.DropView}) {
+		return false, nil
+	}
+
 	for _, t := range c.Tables {
 		db, tabName := comm.SplitDataBaseAndTable(t)
 		if db == "" || tabName == "" {
@@ -1126,7 +1158,7 @@ func (c *SQLRisk) SetItemValue(name, id string, v any, cost int) {
 
 // SetItemError 记录错误信息
 func (c *SQLRisk) SetItemError(name string, e error) {
-	for i, _ := range c.Errors {
+	for i := range c.Errors {
 		if c.Errors[i].Type == name && c.Errors[i].Error == e.Error() {
 			return
 		}

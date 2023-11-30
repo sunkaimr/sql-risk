@@ -73,7 +73,7 @@ func TestIdentifyWorkRiskPreRisk(t *testing.T) {
 	port := "3306"
 	database := "isql_test"
 	sql := `
-CREATE VIEW view1 AS SELECT * FROM alter_table1;
+CREATE VIEW view1 AS SELECT * FROM isql_test.alter_table1;
 `
 	user := "yearning_dml"
 	passwd := "yearning_dml"
