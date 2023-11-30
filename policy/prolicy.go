@@ -265,7 +265,7 @@ func GenerateDefaultPolicy() []Policy {
 			Special:     false,
 			Priority:    999,
 			Description: "未知的动作类型",
-			Suggestion:  "",
+			Suggestion:  "未识别出SQL的动作类型，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.SELECT.000",
@@ -278,7 +278,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "SELECT操作",
 			Suggestion:  "",
 		},
 		{
@@ -292,7 +292,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "DROP操作",
 			Suggestion:  "",
 		},
 		{
@@ -306,7 +306,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "TRUNCATE操作",
 			Suggestion:  "",
 		},
 		{
@@ -320,7 +320,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "CREATE操作",
 			Suggestion:  "",
 		},
 		{
@@ -334,7 +334,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "ALTER操作",
 			Suggestion:  "",
 		},
 		{
@@ -348,7 +348,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "INSERT操作",
 			Suggestion:  "",
 		},
 		{
@@ -362,7 +362,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "REPLACE操作",
 			Suggestion:  "",
 		},
 		{
@@ -376,7 +376,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "DELETE操作",
 			Suggestion:  "",
 		},
 		{
@@ -390,7 +390,21 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "UPDATE操作",
+			Suggestion:  "",
+		},
+		{
+			PolicyID:    "OPE.RENAME.000",
+			Name:        "RENAME动作类型",
+			Enable:      true,
+			Type:        BasicRule,
+			RuleID:      Action.ID,
+			Operator:    RuleOperatorEQ,
+			Value:       Action.V.Rename,
+			Level:       comm.Low,
+			Special:     false,
+			Priority:    10,
+			Description: "RENAME操作",
 			Suggestion:  "",
 		},
 		// KeyWord
@@ -405,8 +419,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "未知的SQL语句",
-			Suggestion:  "未识别或不支持该SQL语句",
+			Description: "未知的关键字",
+			Suggestion:  "未识别出SQL的关键字，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.SELECT.001",
@@ -434,7 +448,7 @@ func GenerateDefaultPolicy() []Policy {
 			Special:     false,
 			Priority:    60,
 			Description: "删除表",
-			Suggestion:  "",
+			Suggestion:  "删除表时请确认表已经不再使用",
 		},
 		{
 			PolicyID:    "OPE.DROP.002",
@@ -447,8 +461,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
-			Suggestion:  "",
+			Description: "删除库",
+			Suggestion:  "删除库时请确认库已经不再使用",
 		},
 		{
 			PolicyID:    "OPE.DROP.003",
@@ -461,8 +475,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
-			Suggestion:  "",
+			Description: "删除索引",
+			Suggestion:  "删除索引可能导致查询性能显著下降。删除某些类型的索引，如唯一索引，可能导致重复数据或数据完整性问题",
 		},
 		{
 			PolicyID:    "OPE.DROP.004",
@@ -475,8 +489,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "删除存储过程",
+			Suggestion:  "删除存储过程是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.DROP.005",
@@ -489,8 +503,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "删除函数",
+			Suggestion:  "删除函数是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.DROP.006",
@@ -503,8 +517,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "删除视图",
+			Suggestion:  "删除视图是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.DROP.007",
@@ -517,8 +531,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "删除触发器",
+			Suggestion:  "删除触发器是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.DROP.008",
@@ -531,8 +545,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
-			Suggestion:  "",
+			Description: "删除表",
+			Suggestion:  "删除表时请确认表已经不再使用，必要时请提前做好数据备份",
 		},
 		{
 			PolicyID:    "OPE.TRUNCATE.001",
@@ -545,8 +559,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
-			Suggestion:  "",
+			Description: "截断表",
+			Suggestion:  "TRUNCATE会快速清空一张表中的所有数据并且重置表的自增计数器，注意它不会触发删除触发器",
 		},
 		{
 			PolicyID:    "OPE.CREATE.001",
@@ -559,8 +573,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    60,
-			Description: "",
-			Suggestion:  "",
+			Description: "创建表",
+			Suggestion:  "创建表是请确保包存在主键，如果有自增列请确保自增列从0开始计数",
 		},
 		{
 			PolicyID:    "OPE.CREATE.002",
@@ -573,8 +587,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "基于其他表的数据创建新表",
+			Suggestion:  "基于其他表的数据创建新表是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.CREATE.003",
@@ -587,8 +601,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "创建临时表",
+			Suggestion:  "创建临时表是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.CREATE.004",
@@ -601,7 +615,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "创建索引",
 			Suggestion:  "",
 		},
 		{
@@ -615,7 +629,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "创建唯一索引",
 			Suggestion:  "",
 		},
 		{
@@ -629,8 +643,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "创建存储过程",
+			Suggestion:  "创建存储过程是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.CREATE.007",
@@ -643,8 +657,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "创建函数",
+			Suggestion:  "创建函数是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.CREATE.008",
@@ -657,8 +671,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "创建视图",
+			Suggestion:  "创建视图是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.CREATE.009",
@@ -671,8 +685,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "创建触发器",
+			Suggestion:  "触发器操作是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.ALTER.001",
@@ -685,7 +699,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "修改数据库表的结构或属性",
 			Suggestion:  "",
 		},
 		{
@@ -699,7 +713,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "添加列",
 			Suggestion:  "",
 		},
 		{
@@ -713,7 +727,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "删除列",
 			Suggestion:  "",
 		},
 		{
@@ -727,8 +741,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
-			Suggestion:  "",
+			Description: "修改表的属性",
+			Suggestion:  "ALTER MODIFY COLUMN用于修改列的类型和默认值等属性，可能会引起表的重构",
 		},
 		{
 			PolicyID:    "OPE.ALTER.005",
@@ -741,7 +755,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "修改列名",
 			Suggestion:  "",
 		},
 		{
@@ -755,8 +769,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    50,
-			Description: "",
-			Suggestion:  "",
+			Description: "修改列名",
+			Suggestion:  "ALTER CHANGE COLUMN用于重命名、修改列类型以及改变列的位置，不会引起表的重构",
 		},
 		{
 			PolicyID:    "OPE.ALTER.007",
@@ -769,7 +783,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "给表添加主键",
 			Suggestion:  "",
 		},
 		{
@@ -783,8 +797,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "删除表的主键",
+			Suggestion:  "删除主键是禁止的操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "OPE.ALTER.009",
@@ -797,7 +811,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "添加索引",
 			Suggestion:  "",
 		},
 		{
@@ -811,7 +825,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "给表添加唯一约束",
 			Suggestion:  "",
 		},
 		{
@@ -825,8 +839,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
-			Suggestion:  "",
+			Description: "给表添加唯一索引",
+			Suggestion:  "添加唯一索引会要求在列中的所有值都必须是唯一的，如果存在重复的值，将会引发错误并阻止索引的创建",
 		},
 		{
 			PolicyID:    "OPE.ALTER.012",
@@ -839,7 +853,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "删除索引",
 			Suggestion:  "",
 		},
 		{
@@ -853,7 +867,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "向表中插入数据",
 			Suggestion:  "",
 		},
 		{
@@ -867,7 +881,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "将一张表的数据插入到另一张表",
 			Suggestion:  "",
 		},
 		{
@@ -881,8 +895,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    60,
-			Description: "",
-			Suggestion:  "",
+			Description: "替换表中的数据",
+			Suggestion:  "如果该列中已经存在与新值相同的数据，那么旧值将被替换为新值。如果该列中不存在与新值相同的数据，那么新值将被添加到表中",
 		},
 		{
 			PolicyID:    "OPE.DELETE.001",
@@ -895,7 +909,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "根据WHERE条件删除表中的部分数据",
 			Suggestion:  "",
 		},
 		{
@@ -909,7 +923,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "删除全表数据",
 			Suggestion:  "",
 		},
 		{
@@ -923,7 +937,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "根据WHERE条件更新表中的部分数据",
 			Suggestion:  "",
 		},
 		{
@@ -937,7 +951,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    60,
-			Description: "",
+			Description: "更新全表数据",
 			Suggestion:  "",
 		},
 		{
@@ -965,8 +979,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     true,
 			Priority:    70,
-			Description: "",
-			Suggestion:  "",
+			Description: "DELETE或UPDATE操作的影响行数是否大于10w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "OPE.AFFECTROWS.002",
@@ -979,8 +993,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     true,
 			Priority:    70,
-			Description: "",
-			Suggestion:  "",
+			Description: "DELETE或UPDATE操作的影响行数是否在2w和10w之间",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "OPE.AFFECTROWS.003",
@@ -993,8 +1007,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    50,
-			Description: "",
-			Suggestion:  "",
+			Description: "DELETE或UPDATE操作的影响行数是否小于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "OPE.AFFECTROWS.004",
@@ -1007,8 +1021,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     true,
 			Priority:    70,
-			Description: "",
-			Suggestion:  "",
+			Description: "DELETE或UPDATE操作的影响行数是否大于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "RUN.CAPACITY.001",
@@ -1021,7 +1035,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    50,
-			Description: "",
+			Description: "大表",
 			Suggestion:  "",
 		},
 		{
@@ -1035,7 +1049,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    50,
-			Description: "",
+			Description: "小表",
 			Suggestion:  "",
 		},
 		{
@@ -1049,7 +1063,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "表行数小于等于10w",
 			Suggestion:  "",
 		},
 		{
@@ -1063,7 +1077,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "表行数大于2w",
 			Suggestion:  "",
 		},
 		{
@@ -1077,7 +1091,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "表行数小于等于2w",
 			Suggestion:  "",
 		},
 		{
@@ -1091,8 +1105,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "磁盘可用空间大于表大小，磁盘容量充足可以进行DDL操作",
-			Suggestion:  "",
+			Description: "磁盘可用空间大于表大小",
+			Suggestion:  "磁盘可用空间大于表大小，磁盘容量充足可以进行DDL操作",
 		},
 		{
 			PolicyID:    "RUN.CAPACITY.007",
@@ -1105,8 +1119,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "磁盘可用空间小于表大小，此时磁盘容量不足以支持DDL操作",
-			Suggestion:  "",
+			Description: "磁盘可用空间小于表大小",
+			Suggestion:  "磁盘可用空间小于表大小，此时磁盘容量不足以支持DDL操作",
 		},
 		{
 			PolicyID:    "RUN.TABINFO.001",
@@ -1119,7 +1133,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "表存在主键",
 			Suggestion:  "",
 		},
 		{
@@ -1133,8 +1147,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    999,
-			Description: "",
-			Suggestion:  "",
+			Description: "表不存在主键",
+			Suggestion:  "当表没有设置主键时不建议对表进行操作，你可以先给表添加主键再进行其他操作",
 		},
 		{
 			PolicyID:    "RUN.TABINFO.003",
@@ -1147,7 +1161,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "表存在外键",
 			Suggestion:  "",
 		},
 		{
@@ -1161,7 +1175,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "表不存在外键",
 			Suggestion:  "",
 		},
 		{
@@ -1175,7 +1189,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "表存在触发器",
 			Suggestion:  "",
 		},
 		{
@@ -1189,7 +1203,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "表不存在触发器",
 			Suggestion:  "",
 		},
 		{
@@ -1203,7 +1217,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "where条件中跟的各列，至少有一列存在索引",
 			Suggestion:  "",
 		},
 		{
@@ -1217,7 +1231,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    10,
-			Description: "",
+			Description: "where条件中跟的各列，都不存在索引",
 			Suggestion:  "",
 		},
 		// 聚合策略 - 按优先级
@@ -1232,7 +1246,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     true,
 			Priority:    150,
-			Description: "",
+			Description: "从匹配到的基本策略里边取优先级最高的策略",
 			Suggestion:  "",
 		},
 		{
@@ -1246,7 +1260,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    140,
-			Description: "",
+			Description: "从匹配到的基本策略里边取优先级最低的策略",
 			Suggestion:  "",
 		},
 		// 聚合策略 - 按风险等级
@@ -1261,7 +1275,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    130,
-			Description: "",
+			Description: "从匹配到的基本策略里边取优先级最低的策略",
 			Suggestion:  "",
 		},
 		{
@@ -1275,7 +1289,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    120,
-			Description: "",
+			Description: "从匹配到的基本策略里边取风险等级最低的策略",
 			Suggestion:  "",
 		},
 		// 聚合策略 - 按匹配结果
@@ -1291,7 +1305,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    150,
-			Description: "",
+			Description: "向表中插入数据",
 			Suggestion:  "",
 		},
 		{
@@ -1305,7 +1319,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    210,
-			Description: "",
+			Description: "将一张表的数据插入到另一张表",
 			Suggestion:  "",
 		},
 		// ALTER
@@ -1320,7 +1334,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    200,
-			Description: "",
+			Description: "修改小表操作",
 			Suggestion:  "",
 		},
 		{
@@ -1334,8 +1348,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "修改大表操作",
+			Suggestion:  "修改大表可能会有一定的安全风险，建议由DBA来操作",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.053",
@@ -1348,8 +1362,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "修改大表时需满足磁盘可用空间大于表大小",
+			Suggestion:  "建议先清理数据或扩容后再操作，如有疑问请联系管理员",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.054",
@@ -1362,8 +1376,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    210,
-			Description: "",
-			Suggestion:  "",
+			Description: "给表添加主键",
+			Suggestion:  "给表添加主键是高风险操作",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.055",
@@ -1376,8 +1390,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    210,
-			Description: "",
-			Suggestion:  "",
+			Description: "删除表的主键",
+			Suggestion:  "禁止删除表的主键，如有疑问请联系管理员",
 		},
 		// DELETE
 		{
@@ -1391,7 +1405,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
-			Description: "",
+			Description: "删除全表数据且表的行数大于10w",
 			Suggestion:  "",
 		},
 		{
@@ -1405,7 +1419,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     true,
 			Priority:    200,
-			Description: "",
+			Description: "删除全表数据且表的行数在2w和10w之间",
 			Suggestion:  "",
 		},
 		{
@@ -1419,7 +1433,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    200,
-			Description: "",
+			Description: "删除全表数据且表的行数小于2w",
 			Suggestion:  "",
 		},
 		{
@@ -1433,8 +1447,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     true,
 			Priority:    210,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件删除表行数小于等于10w的表，且影响行数大于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.105",
@@ -1447,8 +1461,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    210,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件删除表行数小于等于10w的表，且影响行数小于等于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.106",
@@ -1461,8 +1475,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件删除数据，WHERE条件中的各列都没有索引，且影响行数大于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.107",
@@ -1475,8 +1489,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件删除数据，WHERE条件中的各列都没有索引，且影响行数小于等于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.108",
@@ -1486,11 +1500,11 @@ func GenerateDefaultPolicy() []Policy {
 			RuleID:      RuleMatch.ID,
 			Operator:    RuleOperatorALL,
 			Value:       []string{"OPE.DELETE.001", "RUN.TABINFO.007", "OPE.AFFECTROWS.004"},
-			Level:       comm.Low,
+			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件删除数据，WHERE条件中某列存在索引，且影响行数大于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.109",
@@ -1503,8 +1517,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件删除数据，WHERE条件中某列存在索引，且影响行数小于等于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		// UPDATE
 		{
@@ -1518,7 +1532,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
-			Description: "",
+			Description: "更新全表数据且表行数大于10w",
 			Suggestion:  "",
 		},
 		{
@@ -1532,7 +1546,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     true,
 			Priority:    200,
-			Description: "",
+			Description: "更新全表数据且表行数在2w和10w之间",
 			Suggestion:  "",
 		},
 		{
@@ -1546,7 +1560,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    200,
-			Description: "",
+			Description: "更新全表数据且表行数小于2w",
 			Suggestion:  "",
 		},
 		{
@@ -1560,8 +1574,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     true,
 			Priority:    210,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件更新表行数小于等于10w的表，且影响行数大于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.155",
@@ -1574,8 +1588,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    210,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件更新表行数小于等于10w的表，且影响行数小于等于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.156",
@@ -1588,8 +1602,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件更新数据，WHERE条件中的各列都没有索引，且影响行数大于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.157",
@@ -1602,8 +1616,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件更新数据，WHERE条件中的各列都没有索引，且影响行数小于等于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.158",
@@ -1616,8 +1630,8 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     true,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件更新数据，WHERE条件中某列存在索引，且影响行数大于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		{
 			PolicyID:    "AGG.RULEMATCH.159",
@@ -1627,11 +1641,11 @@ func GenerateDefaultPolicy() []Policy {
 			RuleID:      RuleMatch.ID,
 			Operator:    RuleOperatorALL,
 			Value:       []string{"OPE.UPDATE.001", "RUN.TABINFO.007", "OPE.AFFECTROWS.003"},
-			Level:       comm.Low,
+			Level:       comm.High,
 			Special:     false,
 			Priority:    200,
-			Description: "",
-			Suggestion:  "",
+			Description: "根据WHERE条件更新数据，WHERE条件中某列存在索引，且影响行数小于等于2w",
+			Suggestion:  "注意：影响行数是通过EXPLAIN得到的结果与最终的数据修改量可能会有差距",
 		},
 		// CREATE
 		{
@@ -1645,7 +1659,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Low,
 			Special:     false,
 			Priority:    200,
-			Description: "",
+			Description: "创建新表",
 			Suggestion:  "",
 		},
 		// DROP
@@ -1660,7 +1674,7 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.High,
 			Special:     false,
 			Priority:    200,
-			Description: "",
+			Description: "删除表、删除索引",
 			Suggestion:  "",
 		},
 		{
@@ -1674,7 +1688,35 @@ func GenerateDefaultPolicy() []Policy {
 			Level:       comm.Fatal,
 			Special:     false,
 			Priority:    200,
-			Description: "",
+			Description: "删除数据库、存储过程、函数、视图、触发器等",
+			Suggestion:  "禁止的删除操作，如有疑问请联系管理员",
+		},
+		{
+			PolicyID:    "AGG.RULEMATCH.301",
+			Name:        "",
+			Enable:      true,
+			Type:        AggRule,
+			RuleID:      RuleMatch.ID,
+			Operator:    RuleOperatorALL,
+			Value:       []string{"OPE.RENAME.001", "RUN.CAPACITY.002"},
+			Level:       comm.Low,
+			Special:     false,
+			Priority:    200,
+			Description: "修改表名",
+			Suggestion:  "",
+		},
+		{
+			PolicyID:    "AGG.RULEMATCH.302",
+			Name:        "",
+			Enable:      true,
+			Type:        AggRule,
+			RuleID:      RuleMatch.ID,
+			Operator:    RuleOperatorALL,
+			Value:       []string{"OPE.RENAME.001", "RUN.CAPACITY.001"},
+			Level:       comm.High,
+			Special:     false,
+			Priority:    200,
+			Description: "修改大表表名",
 			Suggestion:  "",
 		},
 	}
@@ -1911,7 +1953,7 @@ func IsNumber(input string) bool {
 }
 
 func IsSliceString(str string) bool {
-	return regexp.MustCompile(`^\[.*\]$`).MatchString(strings.TrimSpace(str))
+	return regexp.MustCompile(`^[.*]$`).MatchString(strings.TrimSpace(str))
 }
 
 // GeneratePolicyExpr 生成BASIC类型的expr表达式，修改结果存放到新的策略中，不会影响原始策略
