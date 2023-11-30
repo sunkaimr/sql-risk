@@ -167,6 +167,11 @@ func TestExtractingTableName(t *testing.T) {
 			DataBase: "d1",
 			SQLText:  "DELETE t1, t2 FROM tab1 t1 JOIN d2.tab2 t2 ON t1.num_id = t2.id JOIN d3.tab3 t3 ON t3.num_id = t2.id WHERE t2.id=1;",
 		},
+		{
+			want:     []string{"d1.table1", "d1.table2", "d2.table3"},
+			DataBase: "d1",
+			SQLText:  "CREATE VIEW view1 AS SELECT t1.customer_name, t2.order_id, t3.product_name, t3.price FROM table1 t1 JOIN table2 t2 ON t1.customer_id = t2.customer_id JOIN d2.table3 t3 ON t2.order_id = t3.order_id",
+		},
 	}
 
 	for i, test := range tests {

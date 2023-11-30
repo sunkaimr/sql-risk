@@ -72,9 +72,11 @@ func TestIdentifyWorkRiskPreRisk(t *testing.T) {
 	addr := "10.2.66.8"
 	port := "3306"
 	database := "isql_test"
-	sql := "RENAME TABLE alter_table TO alter_table111"
-	user := "root"
-	passwd := "123456"
+	sql := `
+CREATE VIEW view1 AS SELECT * FROM alter_table1;
+`
+	user := "yearning_dml"
+	passwd := "yearning_dml"
 	j := json.Config{EscapeHTML: false, IndentionStep: 2}.Froze()
 
 	w := NewWorkRisk("111", addr, "", port, user, passwd, database, sql, nil)

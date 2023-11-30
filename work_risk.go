@@ -121,7 +121,7 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 		return err
 	}
 
-	for i, _ := range c.SQLRisks {
+	for i := range c.SQLRisks {
 		err = c.SQLRisks[i].SetSQLBasicInfo()
 		if err != nil {
 			c.SQLRisks[i].SetPreResult(comm.Fatal, false)
@@ -133,21 +133,13 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 	// 统计信息
 	c.CalculateSummary()
 
-	// 校验是否对库进行越权操作
-	err = c.ExceedingPermissions()
-	if err != nil {
-		c.SetPreResult(comm.Fatal, false)
-		c.SetItemError(Authority, err)
-		return err
-	}
-
 	// 抽样检测
 	// insert：按SQL指纹进行采样检测
 	c.SampDetectForInsert()
 
 	matchedPolicies := make([]policy.Policy, 0, len(c.SQLRisks))
 	// 遍历SQL进行前置风险识别
-	for i, _ := range c.SQLRisks {
+	for i := range c.SQLRisks {
 		err = c.SQLRisks[i].IdentifyPreRisk()
 		if err != nil {
 			err = fmt.Errorf("identify SQL risk failed, %s", err)
@@ -184,6 +176,14 @@ func (c *WorkRisk) IdentifyWorkRiskPreRisk() error {
 	}
 	c.SetMatchPolicies(matchedPolicies[0])
 	c.SetPreResult(matchedPolicies[0].Level, matchedPolicies[0].Special)
+
+	// 校验是否对库进行越权操作
+	err = c.ExceedingPermissions()
+	if err != nil {
+		c.SetPreResult(comm.Fatal, false)
+		c.SetItemError(Authority, err)
+		return err
+	}
 	return nil
 }
 
@@ -231,8 +231,8 @@ func (c *WorkRisk) ExceedingPermissions() error {
 			database = append(database, d)
 		}
 
-		if !comm.EleExist(sqlRisk.DataBase, database) {
-			return fmt.Errorf("check exceeding permissions not pass, database(%v) must contain (%v)", database, sqlRisk.DataBase)
+		if len(database) != 0 && !comm.EleExist(sqlRisk.DataBase, database) {
+			return fmt.Errorf("越权操作, 你操作的库%v必须包含选择的库[%s]", database, sqlRisk.DataBase)
 		}
 	}
 
@@ -247,7 +247,7 @@ func (c *WorkRisk) SetPreResult(lev comm.Level, special bool) {
 
 // SetItemError 记录错误信息
 func (c *WorkRisk) SetItemError(name string, e error) {
-	for i, _ := range c.Errors {
+	for i := range c.Errors {
 		if c.Errors[i].Type == name && c.Errors[i].Error == e.Error() {
 			return
 		}

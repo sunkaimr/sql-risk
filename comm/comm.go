@@ -191,7 +191,7 @@ func RemoveSQLComments(sql string) string {
 	// (--[^\n\r]*) 双减号注释
 	// (#.*) 井号注释
 	// (/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/) 多行注释
-	commentRegex := regexp.MustCompile(`("(""|[^"]|(\"))*")|('(''|[^']|(\'))*')|(--[^\n\r]*)|(#.*)|(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)`)
+	commentRegex := regexp.MustCompile(`("(""|[^"]|("))*")|('(''|[^']|('))*')|(--[^\n\r]*)|(#.*)|(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)`)
 
 	res := commentRegex.ReplaceAllFunc(buf, func(s []byte) []byte {
 		if (s[0] == '"' && s[len(s)-1] == '"') ||
@@ -230,7 +230,7 @@ func ExtractingRelatedTableName(sql string, defaultDB string) ([]string, error) 
 	case *ast.UseStmt:
 		tables = append(tables, fmt.Sprintf("%s.", n.DBName))
 	// SetOprStmt represents "union/except/intersect statement"
-	case *ast.InsertStmt, *ast.SelectStmt, *ast.SetOprStmt, *ast.UpdateStmt, *ast.DeleteStmt:
+	case *ast.InsertStmt, *ast.SelectStmt, *ast.SetOprStmt, *ast.UpdateStmt, *ast.DeleteStmt, *ast.CreateViewStmt:
 		// DML/DQL: INSERT, SELECT, UPDATE, DELETE
 		for _, tableRef := range JSONFind(jsonString, "TableRefs") {
 			for _, source := range JSONFind(tableRef, "Source") {
@@ -276,7 +276,7 @@ func ExtractingRelatedTableName(sql string, defaultDB string) ([]string, error) 
 			}
 		}
 	default:
-		// DDL: CREATE TABLE|DATABASE|INDEX|VIEW, DROP INDEX
+		// DDL: CREATE TABLE|DATABASE|INDEX, DROP INDEX
 		schemas := JSONFind(jsonString, "Table")
 		for _, table := range schemas {
 			db := gjson.Get(table, "Schema.O")
@@ -323,9 +323,8 @@ func ExtractingTableName(sql string, defaultDB string) ([]string, error) {
 			defaultDB = n.Table.Schema.L
 		}
 		tables = append(tables, fmt.Sprintf("%s.%s", defaultDB, n.Table.Name))
-	//case *ast.CreateViewStmt:
-	// 未实现
-
+	case *ast.CreateViewStmt:
+		return ExtractingRelatedTableName(sql, defaultDB)
 	// alter操作
 	case *ast.AlterDatabaseStmt:
 		tables = append(tables, fmt.Sprintf("%s.", n.Name))
@@ -991,48 +990,48 @@ func extractingInsertIntoColumns(defaultDB string, aliasMap map[string]string, c
 }
 
 // 提取update ... set的列名
-func extractingSetColumns(defaultDB string, aliasMap map[string]string, columns map[string][]string, updateStmt *ast.UpdateStmt) {
-	for _, col := range updateStmt.List {
-		db, tab, c := defaultDB, col.Column.Table.O, col.Column.Name.O
-		key := ""
-		if al, ok := aliasMap[tab]; ok {
-			key = al
-		} else {
-			// 如果不确定是那个表,也不用关心是库名
-			if tab == "" {
-				key = ""
-			} else {
-				key = fmt.Sprintf("%s.%s", db, tab)
-			}
-		}
+//func extractingSetColumns(defaultDB string, aliasMap map[string]string, columns map[string][]string, updateStmt *ast.UpdateStmt) {
+//	for _, col := range updateStmt.List {
+//		db, tab, c := defaultDB, col.Column.Table.O, col.Column.Name.O
+//		key := ""
+//		if al, ok := aliasMap[tab]; ok {
+//			key = al
+//		} else {
+//			// 如果不确定是那个表,也不用关心是库名
+//			if tab == "" {
+//				key = ""
+//			} else {
+//				key = fmt.Sprintf("%s.%s", db, tab)
+//			}
+//		}
+//
+//		if _, ok := columns[key]; !ok {
+//			columns[key] = []string{c}
+//		} else {
+//			columns[key] = append(columns[key], c)
+//		}
+//	}
+//}
 
-		if _, ok := columns[key]; !ok {
-			columns[key] = []string{c}
-		} else {
-			columns[key] = append(columns[key], c)
-		}
-	}
-}
-
-func extractingUpdateWhereColumns(defaultDB string, aliasMap map[string]string, columns map[string][]string, updateStmt *ast.UpdateStmt) {
-	for _, col := range updateStmt.List {
-		db, tab, c := defaultDB, col.Column.Table.O, col.Column.Name.O
-		key := ""
-		if al, ok := aliasMap[tab]; ok {
-			key = al
-		} else {
-			// 如果不确定是那个表,也不用关心是库名
-			if tab == "" {
-				key = ""
-			} else {
-				key = fmt.Sprintf("%s.%s", db, tab)
-			}
-		}
-
-		if _, ok := columns[key]; !ok {
-			columns[key] = []string{c}
-		} else {
-			columns[key] = append(columns[key], c)
-		}
-	}
-}
+//func extractingUpdateWhereColumns(defaultDB string, aliasMap map[string]string, columns map[string][]string, updateStmt *ast.UpdateStmt) {
+//	for _, col := range updateStmt.List {
+//		db, tab, c := defaultDB, col.Column.Table.O, col.Column.Name.O
+//		key := ""
+//		if al, ok := aliasMap[tab]; ok {
+//			key = al
+//		} else {
+//			// 如果不确定是那个表,也不用关心是库名
+//			if tab == "" {
+//				key = ""
+//			} else {
+//				key = fmt.Sprintf("%s.%s", db, tab)
+//			}
+//		}
+//
+//		if _, ok := columns[key]; !ok {
+//			columns[key] = []string{c}
+//		} else {
+//			columns[key] = append(columns[key], c)
+//		}
+//	}
+//}
