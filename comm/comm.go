@@ -191,8 +191,7 @@ func RemoveSQLComments(sql string) string {
 	// (--[^\n\r]*) 双减号注释
 	// (#.*) 井号注释
 	// (/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/) 多行注释
-	commentRegex := regexp.MustCompile(`("(""|[^"]|("))*")|('(''|[^']|('))*')|(--[^\n\r]*)|(#.*)|(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)`)
-
+	commentRegex := regexp.MustCompile(`("(""|[^"]|(\"))*")|('(''|[^']|(\'))*')|(--[^\n\r]*)|(#.*)|(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)`)
 	res := commentRegex.ReplaceAllFunc(buf, func(s []byte) []byte {
 		if (s[0] == '"' && s[len(s)-1] == '"') ||
 			(s[0] == '\'' && s[len(s)-1] == '\'') ||

@@ -1953,7 +1953,7 @@ func IsNumber(input string) bool {
 }
 
 func IsSliceString(str string) bool {
-	return regexp.MustCompile(`^[.*]$`).MatchString(strings.TrimSpace(str))
+	return regexp.MustCompile(`^\[.*\]$`).MatchString(strings.TrimSpace(str))
 }
 
 // GeneratePolicyExpr 生成BASIC类型的expr表达式，修改结果存放到新的策略中，不会影响原始策略
