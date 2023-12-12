@@ -1043,7 +1043,7 @@ func (c *SQLRisk) CollectIndexExistInWhere() (bool, error) {
 
 		for _, index := range indexs {
 			for _, col := range tabCols {
-				if index.ColumnName == col {
+				if strings.ToLower(index.ColumnName) == strings.ToLower(col) {
 					return true, nil
 				}
 			}
