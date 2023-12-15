@@ -1777,7 +1777,7 @@ func MatchBasicPolicy(env map[string]any) (bool, []Policy, error) {
 	matched := false
 	matchPolicies := make([]Policy, 0, 1)
 	for _, p := range GetPolicy() {
-		if p.Type != BasicRule {
+		if !p.Enable || p.Type != BasicRule {
 			continue
 		}
 
@@ -1809,7 +1809,7 @@ func MatchAggregatePolicy(basicPolicy []Policy) (bool, []Policy, error) {
 	env[strings.ToUpper(RuleLevel.ID+string(RuleOperatorLOW))] = RuleLevelLOW
 
 	for _, p := range GetPolicy() {
-		if p.Type != AggRule {
+		if !p.Enable || p.Type != AggRule {
 			continue
 		}
 
