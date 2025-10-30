@@ -33,32 +33,54 @@ const (
 	cpuUsagePromQL = "100-(avg(rate(node_cpu_seconds_total{instance_ip='%s',mode='idle'}[5m])))*100"
 
 	// 磁盘的使用率（/data目录）
-	diskUsagePromQL = "100-(node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'})*100"
+	diskUsagePromQL0 = "100-(node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'})*100"
 	// 磁盘的总大小（/data目录）
-	diskTotalPromQL = "node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
+	diskTotalPromQL0 = "node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
 	// 磁盘的使用空间（/data目录）
-	diskUsedPromQL = "(node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}-node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'})/1024/1024"
+	diskUsedPromQL0 = "(node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}-node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'})/1024/1024"
 	// 磁盘的剩余空间（/data目录）
-	diskFreePromQL = "node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
+	diskFreePromQL0 = "node_filesystem_free_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
+
+	// linux内核版本差异导致获取磁盘相关指标有差异
+	// 磁盘的使用率（/data目录）
+	//diskUsagePromQL1 = "100-node_filesystem_avail_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'} / node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}*100"
+	//// 磁盘的总大小（/data目录）
+	//diskTotalPromQL1 = "node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
+	//// 磁盘的使用空间（/data目录）
+	//diskUsedPromQL1 = "(node_filesystem_size_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}-node_filesystem_avail_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'})/1024/1024"
+	//// 磁盘的剩余空间（/data目录）
+	//diskFreePromQL1 = "node_filesystem_avail_bytes{instance_ip='%s',mountpoint='/data',fstype=~'ext4|xfs'}/1024/1024"
+	// END
 
 	// 磁盘的使用率（/目录）
-	diskUsagePromQL1 = "100-(node_filesystem_free_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'})*100"
+	diskUsagePromQL2 = "100-(node_filesystem_free_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'})*100"
 	// 磁盘的总大小 （/目录）
-	diskTotalPromQL1 = "node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/1024/1024"
+	diskTotalPromQL2 = "node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/1024/1024"
 	// 磁盘的使用空间（/目录）
-	diskUsedPromQL1 = "(node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}-node_filesystem_free_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'})/1024/1024"
+	diskUsedPromQL2 = "(node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}-node_filesystem_free_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'})/1024/1024"
 	// 磁盘的剩余空间（/目录）
-	diskFreePromQL1 = "node_filesystem_free_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/1024/1024"
+	diskFreePromQL2 = "node_filesystem_free_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/1024/1024"
+
+	// linux内核版本差异导致获取磁盘相关指标有差异
+	// 磁盘的使用率（/目录）
+	//diskUsagePromQL3 = "100-node_filesystem_avail_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'} / node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}*100"
+	//// 磁盘的总大小（/data）
+	//diskTotalPromQL3 = "node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/1024/1024"
+	//// 磁盘的使用空间（/data目录）
+	//diskUsedPromQL3 = "(node_filesystem_size_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}-node_filesystem_avail_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'})/1024/1024"
+	//// 磁盘的剩余空间（/data目录）
+	//diskFreePromQL3 = "node_filesystem_avail_bytes{instance_ip='%s',mountpoint='/',fstype=~'ext4|xfs'}/1024/1024"
+	// END
 
 	// windows系统的监控采集方式
 	// 磁盘的使用率（C:盘）
-	diskUsagePromQL2 = "100-(windows_logical_disk_free_bytes{instance='%s:9182',volume='C:'}/windows_logical_disk_size_bytes{instance='%s:9182',volume='C:'})*100"
+	diskUsagePromQL4 = "100-(windows_logical_disk_free_bytes{instance='%s:9182',volume='C:'}/windows_logical_disk_size_bytes{instance='%s:9182',volume='C:'})*100"
 	// 磁盘的总大小 （C:盘）
-	diskTotalPromQL2 = "windows_logical_disk_size_bytes{instance='%s:9182',volume='C:'}/1024/1024"
+	diskTotalPromQL4 = "windows_logical_disk_size_bytes{instance='%s:9182',volume='C:'}/1024/1024"
 	// 磁盘的使用空间（C:盘）
-	diskUsedPromQL2 = "(windows_logical_disk_size_bytes{instance='%s:9182',volume='C:'}-windows_logical_disk_free_bytes{instance='%s:9182',volume='C:'})/1024/1024"
+	diskUsedPromQL4 = "(windows_logical_disk_size_bytes{instance='%s:9182',volume='C:'}-windows_logical_disk_free_bytes{instance='%s:9182',volume='C:'})/1024/1024"
 	// 磁盘的剩余空间（C:盘）
-	diskFreePromQL2 = "(windows_logical_disk_free_bytes{instance='%s:9182',volume='C:'})/1024/1024"
+	diskFreePromQL4 = "(windows_logical_disk_free_bytes{instance='%s:9182',volume='C:'})/1024/1024"
 )
 
 var NoDataPointError = errors.New("no data points found")
@@ -134,45 +156,58 @@ func (c *Client) GeneralQuery(t time.Time, pql ...string) (float64, error) {
 
 // CpuUsage 查询cpu的使用率
 func (c *Client) CpuUsage(ip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentCpuUsagePromQL, ip)
-	pql2 := fmt.Sprintf(cpuUsagePromQL, ip)
-	return c.GeneralQuery(t, pql1, pql2)
+	return c.GeneralQuery(t,
+		fmt.Sprintf(tencentCpuUsagePromQL, ip),
+		fmt.Sprintf(cpuUsagePromQL, ip),
+	)
 }
 
 // DiskUsage 查询磁盘的使用率
 func (c *Client) DiskUsage(ip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentDiskUsagePromQL, ip)
-	pql2 := fmt.Sprintf(diskUsagePromQL, ip, ip)
-	pql3 := fmt.Sprintf(diskUsagePromQL1, ip, ip)
-	pql4 := fmt.Sprintf(diskUsagePromQL2, ip, ip)
-	return c.GeneralQuery(t, pql1, pql2, pql3, pql4)
+	return c.GeneralQuery(t,
+		fmt.Sprintf(tencentDiskUsagePromQL, ip),
+		fmt.Sprintf(diskUsagePromQL0, ip, ip),
+		//fmt.Sprintf(diskUsagePromQL1, ip, ip),
+		fmt.Sprintf(diskUsagePromQL2, ip, ip),
+		//fmt.Sprintf(diskUsagePromQL3, ip, ip),
+		fmt.Sprintf(diskUsagePromQL4, ip, ip),
+	)
 }
 
 // DiskTotal 磁盘的总大小（MB）
 func (c *Client) DiskTotal(ip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentDiskTotalPromQL, ip, ip)
-	pql2 := fmt.Sprintf(diskTotalPromQL, ip)
-	pql3 := fmt.Sprintf(diskTotalPromQL1, ip)
-	pql4 := fmt.Sprintf(diskTotalPromQL2, ip)
-	return c.GeneralQuery(t, pql1, pql2, pql3, pql4)
+	return c.GeneralQuery(t,
+		fmt.Sprintf(tencentDiskTotalPromQL, ip, ip),
+		fmt.Sprintf(diskTotalPromQL0, ip),
+		//fmt.Sprintf(diskTotalPromQL1, ip),
+		fmt.Sprintf(diskTotalPromQL2, ip),
+		//fmt.Sprintf(diskTotalPromQL3, ip),
+		fmt.Sprintf(diskTotalPromQL4, ip),
+	)
 }
 
 // DiskUsed 磁盘的使用大小(MB)
 func (c *Client) DiskUsed(ip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentDiskUsedPromQL, ip)
-	pql2 := fmt.Sprintf(diskUsedPromQL, ip, ip)
-	pql3 := fmt.Sprintf(diskUsedPromQL1, ip, ip)
-	pql4 := fmt.Sprintf(diskUsedPromQL2, ip, ip)
-	return c.GeneralQuery(t, pql1, pql2, pql3, pql4)
+	return c.GeneralQuery(t,
+		fmt.Sprintf(tencentDiskUsedPromQL, ip),
+		fmt.Sprintf(diskUsedPromQL0, ip, ip),
+		//fmt.Sprintf(diskUsedPromQL1, ip, ip),
+		fmt.Sprintf(diskUsedPromQL2, ip, ip),
+		//fmt.Sprintf(diskUsedPromQL3, ip, ip),
+		fmt.Sprintf(diskUsedPromQL4, ip, ip),
+	)
 }
 
 // DiskFree 磁盘剩余空间大小(MB)
 func (c *Client) DiskFree(ip string, t time.Time) (float64, error) {
-	pql1 := fmt.Sprintf(tencentDiskFreePromQL, ip, ip, ip)
-	pql2 := fmt.Sprintf(diskFreePromQL, ip)
-	pql3 := fmt.Sprintf(diskFreePromQL1, ip)
-	pql4 := fmt.Sprintf(diskFreePromQL2, ip)
-	return c.GeneralQuery(t, pql1, pql2, pql3, pql4)
+	return c.GeneralQuery(t,
+		fmt.Sprintf(tencentDiskFreePromQL, ip, ip, ip),
+		fmt.Sprintf(diskFreePromQL0, ip),
+		//fmt.Sprintf(diskFreePromQL1, ip),
+		fmt.Sprintf(diskFreePromQL2, ip),
+		//fmt.Sprintf(diskFreePromQL3, ip),
+		fmt.Sprintf(diskFreePromQL4, ip),
+	)
 }
 
 // QueryRange 查询区间向量

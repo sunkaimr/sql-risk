@@ -272,6 +272,12 @@ func TestExtractingWhereColumn(t *testing.T) {
 			DataBase: "d1",
 			SQLText:  "DELETE from crowd where id in (1458617,1458630,1458632)",
 		},
+		{
+			name: "test001", want: map[string][]string{"": {"id"}},
+
+			DataBase: "d1",
+			SQLText:  "SELECT * from crowd where trigger_code = 200 AND trigger_time  < DATE_SUB(NOW(), INTERVAL 7 DAY)",
+		},
 	}
 
 	for _, test := range tests {
