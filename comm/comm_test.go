@@ -20,7 +20,7 @@ func TestDML2Select(t *testing.T) {
 		{"test007", "UPDATE org_info_snapshot ois, (SELECT oi.id, oi.parent_id, oi.org_path, oi.type, oi.sapcode, oi.guidkey, oi.codeitemid, oi.level FROM org_info oi WHERE oi.status = 0 AND oi.org_path LIKE CONCAT('1/3/5285/3682', '%') ) tmp SET ois.org_path = tmp.org_path, ois.parent_id = tmp.parent_id, ois.sapcode = tmp.sapcode, ois.type = tmp.type, ois.guidkey = tmp.guidkey, ois.codeitemid = tmp.codeitemid, ois.level = tmp.level, ois.gmt_update = NOW() WHERE ois.id = tmp.id AND ( ois.parent_id <> tmp.parent_id OR ois.type <> tmp.type OR ois.org_path <> tmp.org_path OR ois.level <> tmp.level ) AND ois.status = 0 AND ois.org_path LIKE CONCAT('1/3/5285/3682', '%');", "select * from org_info_snapshot as ois, (select oi.id, oi.parent_id, oi.org_path, oi.type, oi.sapcode, oi.guidkey, oi.codeitemid, oi.`level` from org_info as oi where oi.`status` = 0 and oi.org_path like CONCAT('1/3/5285/3682', '%')) as tmp where ois.id = tmp.id and (ois.parent_id != tmp.parent_id or ois.type != tmp.type or ois.org_path != tmp.org_path or ois.`level` != tmp.`level`) and ois.`status` = 0 and ois.org_path like CONCAT('1/3/5285/3682', '%')"},
 		{"test008", "INSERT INTO students (id, name, age) VALUES (1, 'Tom', 18), (2, 'Jerry', 20), (3, 'Mike', 22), (4, 'Lucy', 19), (5, 'Bob', 21);", "select 5"},
 		{"test009", "INSERT INTO students (id, name, age) VALUES (1, 'Tom', 18)", "select 1"},
-		{"test010", "INSERT INTO students_above_20 (id, name, age, gender) SELECT id, name, age, gender FROM students WHERE age > 20;", "select id, name, age, gender from students where age > 20"},
+		{"test010", "INSERT INTO students_above_20 (id, name, age, gender) SELECT id, name, age, gender FROM students WHERE age > 20;", "select id, `name`, age, gender from students where age > 20"},
 		{"test011", "update test.student a, test1.student1 b set a.name = 'a', b.name = 'b' WHERE a.phone = '1'", "select * from test.student as a, test1.student1 as b where a.phone = '1'"},
 	}
 	for _, test := range tests {
@@ -273,7 +273,7 @@ func TestExtractingWhereColumn(t *testing.T) {
 			SQLText:  "DELETE from crowd where id in (1458617,1458630,1458632)",
 		},
 		{
-			name: "test001", want: map[string][]string{"": {"id"}},
+			name: "test001", want: map[string][]string{"": {"trigger_code", "trigger_time"}},
 
 			DataBase: "d1",
 			SQLText:  "SELECT * from crowd where trigger_code = 200 AND trigger_time  < DATE_SUB(NOW(), INTERVAL 7 DAY)",

@@ -3,14 +3,15 @@ package comm
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/pingcap/tidb/parser"
-	"github.com/pingcap/tidb/parser/ast"
-	_ "github.com/pingcap/tidb/types/parser_driver"
-	"github.com/tidwall/gjson"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/pingcap/tidb/parser"
+	"github.com/pingcap/tidb/parser/ast"
+	_ "github.com/pingcap/tidb/types/parser_driver"
+	"github.com/tidwall/gjson"
 	"vitess.io/vitess/go/vt/sqlparser"
 )
 
@@ -789,12 +790,12 @@ func Select2SelectCount(sql string) (string, error) {
 	selectExprs := sqlparser.SelectExprs{
 		&sqlparser.AliasedExpr{
 			Expr: &sqlparser.FuncExpr{
-				Name: sqlparser.NewColIdent("COUNT"),
+				Name: sqlparser.NewIdentifierCI("COUNT"),
 				Exprs: sqlparser.SelectExprs{
 					&sqlparser.StarExpr{},
 				},
 			},
-			As: sqlparser.NewColIdent("row_count"),
+			As: sqlparser.NewIdentifierCI("row_count"),
 		},
 	}
 	selectStmt.SelectExprs = selectExprs
