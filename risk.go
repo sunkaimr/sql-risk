@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"sort"
+	"strings"
+	"time"
+
 	"github.com/pingcap/tidb/parser"
 	"github.com/pingcap/tidb/parser/ast"
 	_ "github.com/pingcap/tidb/parser/test_driver"
 	"github.com/sunkaimr/sql-risk/comm"
 	"github.com/sunkaimr/sql-risk/policy"
-	"reflect"
-	"sort"
-	"strings"
-	"time"
 )
 
 type SQLRisk struct {
@@ -237,7 +238,7 @@ func (c *SQLRisk) CollectValueWithCache(name, id string, keys []string, method s
 	var err error
 
 	start := time.Now()
-	key := strings.Join([]string{strings.Join(c.Tables, "|"), id, strings.Join(keys, "|")}, "|")
+	key := strings.Join([]string{id, strings.Join(keys, "|")}, "|")
 
 	v, ok := c.cache[key]
 	if !ok || !useCache {
@@ -282,7 +283,7 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.TabExist.Name, policy.TabExist.ID, nil, "CollectTableExist", func() bool {
+	err = c.CollectValueWithCache(policy.TabExist.Name, policy.TabExist.ID, c.Tables, "CollectTableExist", func() bool {
 		//  以下情况不能缓存结果，以防止影响后续的判断
 		if comm.EleExist(keyword, []policy.KeyWordType{
 			policy.KeyWord.V.CreateTab,
@@ -297,12 +298,12 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.TabSize.Name, policy.TabSize.ID, nil, "CollectTableSize", true)
+	err = c.CollectValueWithCache(policy.TabSize.Name, policy.TabSize.ID, c.Tables, "CollectTableSize", true)
 	if err != nil {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.TabRows.Name, policy.TabRows.ID, nil, "CollectTableRows", true)
+	err = c.CollectValueWithCache(policy.TabRows.Name, policy.TabRows.ID, c.Tables, "CollectTableRows", true)
 	if err != nil {
 		return err
 	}
@@ -312,17 +313,17 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.FreeDisk.Name, policy.FreeDisk.ID, nil, "CollectFreeDisk", true)
+	err = c.CollectValueWithCache(policy.FreeDisk.Name, policy.FreeDisk.ID, c.Tables, "CollectFreeDisk", true)
 	if err != nil {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.DiskSufficient.Name, policy.DiskSufficient.ID, nil, "CollectDiskSufficient", true)
+	err = c.CollectValueWithCache(policy.DiskSufficient.Name, policy.DiskSufficient.ID, []string{c.Addr}, "CollectDiskSufficient", true)
 	if err != nil {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.PrimaryKeyExist.Name, policy.PrimaryKeyExist.ID, nil, "CollectPrimaryKeyExist", func() bool {
+	err = c.CollectValueWithCache(policy.PrimaryKeyExist.Name, policy.PrimaryKeyExist.ID, c.Tables, "CollectPrimaryKeyExist", func() bool {
 		//  以下情况不能缓存主键的结果，以防止影响后续的判断
 		if comm.EleExist(keyword, []policy.KeyWordType{
 			policy.KeyWord.V.DropTabIfExist,
@@ -337,12 +338,12 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.ForeignKeyExist.Name, policy.ForeignKeyExist.ID, nil, "CollectForeignKeyExist", true)
+	err = c.CollectValueWithCache(policy.ForeignKeyExist.Name, policy.ForeignKeyExist.ID, c.Tables, "CollectForeignKeyExist", true)
 	if err != nil {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.TriggerExist.Name, policy.TriggerExist.ID, nil, "CollectTriggerExist", true)
+	err = c.CollectValueWithCache(policy.TriggerExist.Name, policy.TriggerExist.ID, c.Tables, "CollectTriggerExist", true)
 	if err != nil {
 		return err
 	}
