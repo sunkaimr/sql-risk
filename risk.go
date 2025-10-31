@@ -313,12 +313,12 @@ func (c *SQLRisk) CollectPreRiskValues() error {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.FreeDisk.Name, policy.FreeDisk.ID, c.Tables, "CollectFreeDisk", true)
+	err = c.CollectValueWithCache(policy.FreeDisk.Name, policy.FreeDisk.ID, []string{c.Addr}, "CollectFreeDisk", true)
 	if err != nil {
 		return err
 	}
 
-	err = c.CollectValueWithCache(policy.DiskSufficient.Name, policy.DiskSufficient.ID, []string{c.Addr}, "CollectDiskSufficient", true)
+	err = c.CollectValueWithCache(policy.DiskSufficient.Name, policy.DiskSufficient.ID, c.Tables, "CollectDiskSufficient", true)
 	if err != nil {
 		return err
 	}
